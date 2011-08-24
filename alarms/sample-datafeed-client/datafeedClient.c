@@ -193,6 +193,9 @@ int main (int argc, char *argv[])
                            radSocketGetPort (ClientSocket),
                            (int)hostRecord.dateTime);
                 break;
+            default:
+               printf("dataFeedClient: unknown retval: %d\n", retVal);
+               exit(1);
         }
     }
 
