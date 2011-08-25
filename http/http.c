@@ -176,6 +176,69 @@ static void processWUNDERGROUND (WVIEW_MSG_ARCHIVE_NOTIFY *notify)
     return;
 }
 
+static void processWUNDERGROUNDRapid (LOOP_PKT *loopData);
+
+static void processWUNDERGROUNDRapid (LOOP_PKT *loopData)
+{
+    RADSOCK_ID          socket;
+    time_t              ntime;
+    struct tm           gmTime;
+    int                 length = 0;
+    char                *serv;
+    int                 port;
+    char                version[64];
+    
+    // format the WUNDERGROUND data
+    ntime = time (NULL);
+    gmtime_r (&ntime, &gmTime);
+    length = sprintf (httpBuffer, "http://rtupdate.wunderground.com/weatherstation/updateweatherstation.php?realtime=1&rtfreq=15&");
+    length += sprintf (&httpBuffer[length], "ID=%s&PASSWORD=%s",
+                       httpWork.stationId, httpWork.password);
+
+    length += sprintf (&httpBuffer[length], "&dateutc=%4.4d-%2.2d-%2.2d+%2.2d%%3a%2.2d%%3a%2.2d",
+                       gmTime.tm_year + 1900, gmTime.tm_mon + 1, gmTime.tm_mday, 
+                       gmTime.tm_hour, gmTime.tm_min, gmTime.tm_sec);
+
+    // check for any wind registered
+    if (loopData->windSpeed >= 0 || loopData->windGust >= 0)
+    {
+        length += sprintf (&httpBuffer[length], "&winddir=%3.3d", loopPkt->windDir);
+    }
+    
+    length += sprintf (&httpBuffer[length], "&windspeedmph=%3.3d", 
+                       (loopPkt->windSpeed >= 0) ? loopPkt->windSpeed : 0);
+    length += sprintf (&httpBuffer[length], "&windgustmph=%3.3d", 
+                       (loopPkt->windGust >= 0) ? loopPkt->windGust : 0);
+
+    if (loopPkt->outHumidity >= 0 && loopPkt->outHumidity <= 100)
+    {
+        length += sprintf (&httpBuffer[length], "&humidity=%d", loopPkt->outHumidity);
+    }
+
+    length += sprintf (&httpBuffer[length], "&tempf=%.1f", 
+                       loopPkt->outTemp);
+    
+    // length += sprintf (&httpBuffer[length], "&rainin=%.2f", rainIN);
+    
+    length += sprintf (&httpBuffer[length], "&dailyrainin=%.2f", 
+                       loopPkt->dayRain);
+
+    length += sprintf (&httpBuffer[length], "&baromin=%.2f", 
+                       loopPkt->barometer);
+
+    length += sprintf (&httpBuffer[length], "&dewptf=%.3f", 
+                       loopPkt->dewpoint);
+
+    strcpy (version, globalWviewVersionStr);
+    version[5] = '-';
+    length += sprintf (&httpBuffer[length], "&weather=&clouds=&softwaretype=%s&action=updateraw",
+                       version);
+
+    wuSendCurl(httpBuffer);
+
+    return;
+}
+
 static void processWEATHERFORYOU (WVIEW_MSG_ARCHIVE_NOTIFY *notify)
 {
     RADSOCK_ID          socket;
