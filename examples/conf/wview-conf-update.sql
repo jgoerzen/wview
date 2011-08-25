@@ -33,5 +33,6 @@ INSERT OR IGNORE INTO "config" VALUES('STATION_WLIP','no','Enable WeatherlinkIP 
 INSERT OR IGNORE INTO "config" VALUES('ALARMS_DO_TEST','no','Test an alarm by faking it when alarms are initialized?','ENABLE_ALARMS');
 INSERT OR IGNORE INTO "config" VALUES('ALARMS_DO_TEST_NUMBER','1','Which alarm (1 - 10) to test:','ENABLE_ALARMS');
 INSERT OR IGNORE INTO "config" VALUES('HTMLGEN_STATION_SHOW_IF','yes','Show interface details:','ENABLE_HTMLGEN');
+INSERT OR IGNORE INTO "config" VALUES('HTTP_WURAPIDFIRE', 'no', 'Use RapidFire for WUNDERGROUND', 'ENABLE_HTTP');
 COMMIT;
 
