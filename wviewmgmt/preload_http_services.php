@@ -58,6 +58,7 @@
     // HTTP:
     $field_HTTP_Wunderground_ID             = SqliteDBGetValue($dbID, 'HTTP_WUSTATIONID');
     $field_HTTP_Wunderground_Password       = SqliteDBGetValue($dbID, 'HTTP_WUPASSWD');
+    $field_HTTP_Wunderground_Rapid          = SqliteDBGetValue($dbID, 'HTTP_WURAPIDFIRE');
     $field_HTTP_Weatherforyou_ID            = SqliteDBGetValue($dbID, 'HTTP_YOUSTATIONID');
     $field_HTTP_Weatherforyou_Password      = SqliteDBGetValue($dbID, 'HTTP_YOUPASSWD');
     
