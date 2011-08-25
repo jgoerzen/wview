@@ -3362,6 +3362,14 @@
       Goto http://www.hamweather.net/weatherstations/pwsupdate.php?ID=XXXXXXX
       where XXXXXXX is your Weatherforyou Station ID. This should start displaying 
       your weather data as a packet list.<br><br>
+      <b>Rapid Fire:</b><br><br>
+      Weather Underground has a "rapid fire" feature supporting much
+      more frequent updates.  If you select the "rapid fire" checkbox,
+      you MUST also set your sensor poll interval and data push
+      interval to 15 seconds on the Station tab.  wview will then push
+      a "rapid fire" update on every "loop" packet (15-second poll)
+      and a regular update on every "archive" packet (5 minutes or
+      whatever you've configured).<br><br>
     </p>
 
     <!-- Section 3 -->
