@@ -85,6 +85,7 @@ typedef struct
     char            wviewdir[128];
     char            stationId[128];
     char            password[64];
+    int             wuRapidFire;
     char            youstationId[128];
     char            youpassword[64];
     WV_ACCUM_ID     rainAccumulator;

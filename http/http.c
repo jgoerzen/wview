@@ -68,6 +68,52 @@ static size_t recv_data (void *buffer, size_t size, size_t nmemb, void *userp)
     return size*nmemb;
 }
 
+static void wuSendCurl(char *httpBuffer);
+
+static void wuSendCurl(char *httpBuffer) {
+    CURL                *curl;
+    CURLcode            res;
+    char                curlError[CURL_ERROR_SIZE];
+    char                tempBfr[194];
+
+    wvstrncpy (tempBfr, httpBuffer, 192);
+    wvutilsLogEvent (PRI_STATUS, "WUNDERGROUND-send: %s", tempBfr);
+    if (strlen(httpBuffer) > 192)
+    {
+        wvstrncpy (tempBfr, &httpBuffer[192], 192);
+        wvutilsLogEvent (PRI_STATUS, "WUNDERGROUND-send: %s", tempBfr);
+    }
+
+
+    // OK, now use libcurl to execute the HTTP "GET"
+    curl = curl_easy_init ();
+    if (curl == NULL)
+    {
+        radMsgLog (PRI_HIGH, "WUNDERGROUND-error: failed to initialize curl!");
+        statusUpdateMessage("HTTP-WU: failed to initialize curl");
+        statusIncrementStat(HTTP_STATS_CONNECT_ERRORS);
+        return;
+    }
+    
+    curl_easy_setopt (curl, CURLOPT_URL, httpBuffer);
+    curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, recv_data);
+    curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, curlError);
+    curl_easy_setopt (curl, CURLOPT_TIMEOUT, 60);
+
+    res = curl_easy_perform (curl);
+    if (res != 0)
+    {
+        statusUpdateMessage("HTTP-WU: failed curl_easy_perform");
+        statusIncrementStat(HTTP_STATS_CONNECT_ERRORS);
+        radMsgLog (PRI_HIGH, "WUNDERGROUND-error: %s", curlError);
+    }
+    
+    curl_easy_cleanup (curl);
+    statusIncrementStat(HTTP_STATS_PKTS_SENT);
+
+    return;
+}
+
 static void processWUNDERGROUND (WVIEW_MSG_ARCHIVE_NOTIFY *notify)
 {
     RADSOCK_ID          socket;
@@ -77,10 +123,6 @@ static void processWUNDERGROUND (WVIEW_MSG_ARCHIVE_NOTIFY *notify)
     char                *serv;
     int                 port;
     char                version[64];
-    CURL                *curl;
-    CURLcode            res;
-    char                curlError[CURL_ERROR_SIZE];
-    char                tempBfr[194];
     float               rainIN = sensorAccumGetTotal (httpWork.rainAccumulator);
     
     // format the WUNDERGROUND data
@@ -129,41 +171,7 @@ static void processWUNDERGROUND (WVIEW_MSG_ARCHIVE_NOTIFY *notify)
     length += sprintf (&httpBuffer[length], "&weather=&clouds=&softwaretype=%s&action=updateraw",
                        version);
 
-
-    wvstrncpy (tempBfr, httpBuffer, 192);
-    wvutilsLogEvent (PRI_STATUS, "WUNDERGROUND-send: %s", tempBfr);
-    if (strlen(httpBuffer) > 192)
-    {
-        wvstrncpy (tempBfr, &httpBuffer[192], 192);
-        wvutilsLogEvent (PRI_STATUS, "WUNDERGROUND-send: %s", tempBfr);
-    }
-
-
-    // OK, now use libcurl to execute the HTTP "GET"
-    curl = curl_easy_init ();
-    if (curl == NULL)
-    {
-        radMsgLog (PRI_HIGH, "WUNDERGROUND-error: failed to initialize curl!");
-        statusUpdateMessage("HTTP-WU: failed to initialize curl");
-        statusIncrementStat(HTTP_STATS_CONNECT_ERRORS);
-        return;
-    }
-    
-    curl_easy_setopt (curl, CURLOPT_URL, httpBuffer);
-    curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, recv_data);
-    curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, curlError);
-    curl_easy_setopt (curl, CURLOPT_TIMEOUT, 60);
-
-    res = curl_easy_perform (curl);
-    if (res != 0)
-    {
-        statusUpdateMessage("HTTP-WU: failed curl_easy_perform");
-        statusIncrementStat(HTTP_STATS_CONNECT_ERRORS);
-        radMsgLog (PRI_HIGH, "WUNDERGROUND-error: %s", curlError);
-    }
-    
-    curl_easy_cleanup (curl);
-    statusIncrementStat(HTTP_STATS_PKTS_SENT);
+    wuSendCurl(httpBuffer);
 
     return;
 }
@@ -465,9 +473,10 @@ static void msgHandler
 {
     WVIEW_MSG_ARCHIVE_NOTIFY    *anMsg;
     time_t                      nowTime = time (NULL);
+    LOOP_PKT*                   loopData;
     
-    if (msgType == WVIEW_MSG_TYPE_ARCHIVE_NOTIFY)
-    {
+    switch (msgType) {
+      case WVIEW_MSG_TYPE_ARCHIVE_NOTIFY: {
         anMsg = (WVIEW_MSG_ARCHIVE_NOTIFY *)msg;
 
         // Update the rain accumulator
@@ -482,11 +491,25 @@ static void msgHandler
         {
             processWEATHERFORYOU (anMsg);
         }
-    }
-    else if (msgType == WVIEW_MSG_TYPE_POLL)
-    {
+        return;
+      }
+      case WVIEW_MSG_TYPE_LOOP_DATA_SVC: {
+        loopData = &(((WVIEW_MSG_LOOP_DATA*)msg)->loopData);
+        if (strcmp(httpWork.stationId, "0") &&
+            httpWork.wuRapidFire) {
+          processWUNDERGROUNDRapid(loopData);
+        }
+        return;
+      }            
+      case WVIEW_MSG_TYPE_POLL: {
         WVIEW_MSG_POLL*     pPoll = (WVIEW_MSG_POLL*)msg;
         wvutilsSendPMONPollResponse (pPoll->mask, PMON_PROCESS_WVHTTPD);
+        return;
+      }
+      case WVIEW_MSG_TYPE_LOOP_DATA_SVC: {
+        
+      }
+      default:
         return;
     }
 
@@ -672,6 +695,15 @@ int main (int argc, char *argv[])
             strcpy (httpWork.stationId, "0");
             strcpy (httpWork.password, "0");
         }
+    }
+
+    // Is WU Rapid Fire Enabled?
+    iValue = wvconfigGetBooleanValue(configItem_HTTP_WUNDERGOUND_RAPID);
+    if (iValue == ERROR || iValue == 0)
+    {
+        httpWork.wuRapidFire = 0;
+    } else {
+      httpWork.wuRapidFire = 1;
     }
 
     // get the YOU STATION ID
