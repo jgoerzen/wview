@@ -225,6 +225,7 @@
 
 #define configItemHTTP_WUSTATIONID                              "HTTP_WUSTATIONID"
 #define configItemHTTP_WUPASSWD                                 "HTTP_WUPASSWD"
+#define configItemHTTP_WURAPIDFIRE                              "HTTP_WURAPIDFIRE"
 #define configItemHTTP_YOUSTATIONID                             "HTTP_YOUSTATIONID"
 #define configItemHTTP_YOUPASSWD                                "HTTP_YOUPASSWD"
 

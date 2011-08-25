@@ -211,6 +211,28 @@
     <td></td>
   </tr>
 
+  <!-- Text: -->
+  <tr> 
+    <td height="30" align="right" valign="center" bgcolor="#E7E7E7"></td>
+    <td valign="center" bgcolor="#E7E7E7"></td>
+    <td valign="center" bgcolor="#FFFFFF"></td>
+
+    <td valign="center" bgcolor="#FFFFFF"> 
+      <label class="formFieldQuestion">Use Rapid Fire Updates?
+        <a class=info href=#><img src=imgs/tip_small.png border=0>
+          <span class=infobox>Send updates every 15 seconds.  Requires
+          sensor polling interval and data push interval to both be
+         set to 155 seconds. </span>
+        </a>
+      </label>
+    </td>
+    <td valign="center" bgcolor="#FFFFFF">
+      <input class=mainForm type=checkbox name=field_HTTP_Wunderground_Rapid[] id=field_HTTP_Wunderground_Rapid_option_1 value="yes" 
+        <?php if ($field_HTTP_Wunderground_Rapid == "yes") echo "checked"; ?>>
+    </td>
+    <td></td>
+  </tr>
+
   <!-- Section Heading: -->
   <tr> 
     <td width="124" height="12" valign="center" align="right" bgcolor="#E7E7E7">

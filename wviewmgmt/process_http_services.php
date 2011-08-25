@@ -16,7 +16,11 @@
     SqliteDBSetValue($dbID, 'HTTP_WUPASSWD', $_POST['field_HTTP_Wunderground_Password']);
     SqliteDBSetValue($dbID, 'HTTP_YOUSTATIONID', $_POST['field_HTTP_Weatherforyou_ID']);
     SqliteDBSetValue($dbID, 'HTTP_YOUPASSWD', $_POST['field_HTTP_Weatherforyou_Password']);
-    
+    if ($_POST['field_HTTP_Wunderground_Rapid'][0] == "yes")
+        SqliteDBSetValue($dbID, 'HTTP_WURAPIDFIRE', 'yes');
+    else
+        SqliteDBSetValue($dbID, 'HTTP_WURAPIDFIRE', 'no');
+
 
     // Close the database connection:
     SqliteDBClose($dbID);
