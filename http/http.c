@@ -895,6 +895,9 @@ int main (int argc, char *argv[])
     // enable message reception from the radlib router for archive notifications
     radMsgRouterMessageRegister (WVIEW_MSG_TYPE_ARCHIVE_NOTIFY);
 
+    // enable message reception from the radlib router for loop data
+    radMsgRouterMessageRegister (WVIEW_MSG_TYPE_LOOP_DATA_SVC);
+
     // enable message reception from the radlib router for POLL msgs
     radMsgRouterMessageRegister (WVIEW_MSG_TYPE_POLL);
 
