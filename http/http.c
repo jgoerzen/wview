@@ -202,32 +202,32 @@ static void processWUNDERGROUNDRapid (LOOP_PKT *loopData)
     // check for any wind registered
     if (loopData->windSpeed >= 0 || loopData->windGust >= 0)
     {
-        length += sprintf (&httpBuffer[length], "&winddir=%3.3d", loopPkt->windDir);
+        length += sprintf (&httpBuffer[length], "&winddir=%3.3d", loopData->windDir);
     }
     
     length += sprintf (&httpBuffer[length], "&windspeedmph=%3.3d", 
-                       (loopPkt->windSpeed >= 0) ? loopPkt->windSpeed : 0);
+                       (loopData->windSpeed >= 0) ? loopData->windSpeed : 0);
     length += sprintf (&httpBuffer[length], "&windgustmph=%3.3d", 
-                       (loopPkt->windGust >= 0) ? loopPkt->windGust : 0);
+                       (loopData->windGust >= 0) ? loopData->windGust : 0);
 
-    if (loopPkt->outHumidity >= 0 && loopPkt->outHumidity <= 100)
+    if (loopData->outHumidity >= 0 && loopData->outHumidity <= 100)
     {
-        length += sprintf (&httpBuffer[length], "&humidity=%d", loopPkt->outHumidity);
+        length += sprintf (&httpBuffer[length], "&humidity=%d", loopData->outHumidity);
     }
 
     length += sprintf (&httpBuffer[length], "&tempf=%.1f", 
-                       loopPkt->outTemp);
+                       loopData->outTemp);
     
     // length += sprintf (&httpBuffer[length], "&rainin=%.2f", rainIN);
     
     length += sprintf (&httpBuffer[length], "&dailyrainin=%.2f", 
-                       loopPkt->dayRain);
+                       loopData->dayRain);
 
     length += sprintf (&httpBuffer[length], "&baromin=%.2f", 
-                       loopPkt->barometer);
+                       loopData->barometer);
 
     length += sprintf (&httpBuffer[length], "&dewptf=%.3f", 
-                       loopPkt->dewpoint);
+                       loopData->dewpoint);
 
     strcpy (version, globalWviewVersionStr);
     version[5] = '-';
@@ -569,9 +569,6 @@ static void msgHandler
         wvutilsSendPMONPollResponse (pPoll->mask, PMON_PROCESS_WVHTTPD);
         return;
       }
-      case WVIEW_MSG_TYPE_LOOP_DATA_SVC: {
-        
-      }
       default:
         return;
     }
@@ -761,7 +758,7 @@ int main (int argc, char *argv[])
     }
 
     // Is WU Rapid Fire Enabled?
-    iValue = wvconfigGetBooleanValue(configItem_HTTP_WUNDERGOUND_RAPID);
+    iValue = wvconfigGetBooleanValue(configItemHTTP_WURAPIDFIRE);
     if (iValue == ERROR || iValue == 0)
     {
         httpWork.wuRapidFire = 0;
