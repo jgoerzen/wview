@@ -186,6 +186,7 @@ static void processWUNDERGROUNDRapid (LOOP_PKT *loopData)
     int                 length = 0;
     char                *serv;
     int                 port;
+    float               rainIN = sensorAccumGetTotal (httpWork.rainAccumulator);
     char                version[64];
     
     // format the WUNDERGROUND data
@@ -218,7 +219,7 @@ static void processWUNDERGROUNDRapid (LOOP_PKT *loopData)
     length += sprintf (&httpBuffer[length], "&tempf=%.1f", 
                        loopData->outTemp);
     
-    // length += sprintf (&httpBuffer[length], "&rainin=%.2f", rainIN);
+    length += sprintf (&httpBuffer[length], "&rainin=%.2f", rainIN);
     
     length += sprintf (&httpBuffer[length], "&dailyrainin=%.2f", 
                        loopData->dayRain);
