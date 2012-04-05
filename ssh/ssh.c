@@ -196,8 +196,8 @@ static void evtHandler
 
 static void timerHandler (void *parm)
 {
-    ULONGLONG   msOffset = radTimeGetMSSinceEpoch ();
-    long long   netOffset;
+    uint64_t    msOffset = radTimeGetMSSinceEpoch ();
+    int64_t     netOffset;
 
     //  ... allow for timer latency
     if (sshWork.msOffset == 0ULL)
@@ -213,7 +213,7 @@ static void timerHandler (void *parm)
 
     sshWork.msOffset += 60000ULL;               // ALWAYS 1 minute
 
-    radProcessTimerStart (sshWork.timer, (ULONG)(60000LL - netOffset));
+    radProcessTimerStart (sshWork.timer, (uint32_t)(60000LL - netOffset));
 
 
     //  ... process the ssh rules

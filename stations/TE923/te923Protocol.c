@@ -63,19 +63,19 @@ static time_t               lastAvgTime;
 
 // Local methods:
 
-static UCHAR bcdDecode(UCHAR byte)
+static uint8_t bcdDecode(uint8_t byte)
 {
     return ((int)((byte & 0xF0) >> 4) * 10 + (int)(byte & 0x0F));
 }
 
-static int readBlock (WVIEWD_WORK *work, int offset, UCHAR* buffer)
+static int readBlock (WVIEWD_WORK *work, int offset, uint8_t* buffer)
 {
     // Read data at offset 'offset':
     // After sending the read command, the device will send back 32 bytes data within 100ms.
     // If not, then it means the command has not been received correctly.
 
     char     rqstBuffer[8];
-    UCHAR    crc;
+    uint8_t  crc;
     int      i, retVal, bytes, count = 0;
 
     rqstBuffer[0] = 0x05;
@@ -132,7 +132,7 @@ static int readStationData (WVIEWD_WORK *work)
     int             ret, i, offset, isInvalid;
     float*          pTemp;
     int             adr = 0x020001;
-    UCHAR           buf[TE923_BUFLEN];
+    uint8_t         buf[TE923_BUFLEN];
 
     if ((*(work->medium.usbhidInit))(&work->medium) != OK)
     {
@@ -331,7 +331,7 @@ static int readStationStatus(WVIEWD_WORK *work)
 {
     int             i, ret;
     int             adr = 0x00004C;
-    UCHAR           buf[TE923_BUFLEN];
+    uint8_t         buf[TE923_BUFLEN];
     TE923_DATA*     sensors = &te923Work.sensorData;
 
     if ((*(work->medium.usbhidInit))(&work->medium) != OK)
@@ -477,29 +477,29 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, TE923_DATA *src)
     {
         tempfloat = src->outhumidity[0];
         tempfloat += 0.5;
-        dest->outHumidity  = (USHORT)tempfloat;
+        dest->outHumidity  = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windAvgSpeed && src->windAvgSpeed <= 250)
     {
         tempfloat = src->windAvgSpeed;
         tempfloat += 0.5;
-        dest->windSpeed  = (USHORT)tempfloat;
+        dest->windSpeed  = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windDir && src->windDir <= 360)
     {
         tempfloat = src->windDir;
         tempfloat += 0.5;
-        dest->windDir        = (USHORT)tempfloat;
-        dest->windGustDir    = (USHORT)tempfloat;
+        dest->windDir        = (uint16_t)tempfloat;
+        dest->windGustDir    = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windGustSpeed && src->windGustSpeed <= 250)
     {
         tempfloat = src->windGustSpeed;
         tempfloat += 0.5;
-        dest->windGust       = (USHORT)tempfloat;
+        dest->windGust       = (uint16_t)tempfloat;
     }
 
     if (0 <= src->rain)
@@ -548,7 +548,7 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, TE923_DATA *src)
     dest->inTemp                        = src->intemp;
     tempfloat = src->inhumidity;
     tempfloat += 0.5;
-    dest->inHumidity                    = (USHORT)tempfloat;
+    dest->inHumidity                    = (uint16_t)tempfloat;
     dest->UV                            = src->UV;
 
     // Do the extras:

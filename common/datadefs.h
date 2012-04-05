@@ -37,6 +37,7 @@
 #include <string.h>
 #include <signal.h>
 #include <math.h>
+#include <inttypes.h>
 #include <sys/stat.h>
 
 /*  ... Library include files
@@ -44,6 +45,7 @@
 #ifndef WVIEW_DATA_ONLY
 #include <sysdefs.h>
 #else
+#include <stdint.h>
 #include <radsysdefs.h>
 #endif
 
@@ -61,13 +63,11 @@
 #define WAVG_TOTAL_BINS                 (WAVG_NUM_BINS + WAVG_CONSENSUS_BINS)
 typedef struct
 {
-    short       bins[WAVG_TOTAL_BINS];
-}
-WAVG, *WAVG_ID;
+    int16_t     bins[WAVG_TOTAL_BINS];
+} WAVG, *WAVG_ID;
 
 
-
-// Define the data value indices:
+// Define the data value indices for historical data:
 typedef enum
 {
     DATA_INDEX_barometer            = 0,
@@ -122,11 +122,11 @@ typedef enum
     DATA_INDEX_inTempBatteryStatus,
 
     DATA_INDEX_MAX
-}
-Data_Indices;
+} Data_Indices;
 
 
 #define DATA_INDEX_MAX(x)    ((x) ? DATA_INDEX_MAX : DATA_INDEX_BASIC_MAX)
+
 
 // Define sensor types:
 typedef enum
@@ -149,8 +149,7 @@ typedef enum
     SENSOR_HAIL,
     SENSOR_HAILRATE,
     SENSOR_MAX
-}
-SENSOR_TYPES;
+} SENSOR_TYPES;
 
 // Define sensor time frames:
 typedef enum
@@ -163,8 +162,7 @@ typedef enum
     STF_YEAR,
     STF_ALL,
     STF_MAX
-}
-SENSOR_TIMEFRAMES;
+} SENSOR_TIMEFRAMES;
 
 
 // the sensor data type:
@@ -178,8 +176,7 @@ typedef struct
     float               cumulative;
     int                 samples;
     int                 debug;
-}
-WV_SENSOR;
+} WV_SENSOR;
 
 
 //  ... for NOAA_DATA structure
@@ -193,8 +190,7 @@ typedef enum
     NOAA_TYPE_WIND_HIGH,
     NOAA_TYPE_WIND_DIR,
     NOAA_TYPE_MAX
-}
-NOAA_TYPE;
+} NOAA_TYPE;
 
 
 // internal HILOW data store
@@ -204,33 +200,32 @@ typedef struct
     WAVG                wind[STF_MAX];
 
     float               hourchangetemp;             // difference in degrees
-    short               hourchangewind;             // difference in mph
-    short               hourchangewinddir;          // difference in degrees
-    short               hourchangehumid;            // difference in %
+    int16_t             hourchangewind;             // difference in mph
+    int16_t             hourchangewinddir;          // difference in degrees
+    int16_t             hourchangehumid;            // difference in %
     float               hourchangedewpt;            // difference in degrees
     float               hourchangebarom;            // difference in inches
 
     float               daychangetemp;              // difference in degrees
-    short               daychangewind;              // difference in mph
-    short               daychangewinddir;           // difference in degrees
-    short               daychangehumid;             // difference in %
+    int16_t             daychangewind;              // difference in mph
+    int16_t             daychangewinddir;           // difference in degrees
+    int16_t             daychangehumid;             // difference in %
     float               daychangedewpt;             // difference in degrees
     float               daychangebarom;             // difference in inches
 
     float               weekchangetemp;             // difference in degrees
-    short               weekchangewind;             // difference in mph
-    short               weekchangewinddir;          // difference in degrees
-    short               weekchangehumid;            // difference in %
+    int16_t             weekchangewind;             // difference in mph
+    int16_t             weekchangewinddir;          // difference in degrees
+    int16_t             weekchangehumid;            // difference in %
     float               weekchangedewpt;            // difference in degrees
     float               weekchangebarom;            // difference in inches
 
-}
-SENSOR_STORE;
+} SENSOR_STORE;
 
 
 // LOOP_PKT - define the LOOP (current readings) data format for IPM msgs and
 //            station sensor polling; those required for archive generation
-//            and HILOW are marked "!" and MUST be provided by the station
+//            and HILOW are marked "!" and MUST be provided by the station.
 #define WVIEW_NUM_EXTRA_SENSORS     16
 typedef struct
 {
@@ -240,16 +235,16 @@ typedef struct
     float               altimeter;              /* ! inches               */
     float               inTemp;                 /* ! degrees F            */
     float               outTemp;                /* ! degrees F            */
-    USHORT              inHumidity;             /* ! percent              */
-    USHORT              outHumidity;            /* ! percent              */
-    USHORT              windSpeed;              /* ! mph                  */
-    USHORT              windDir;                /* ! degrees              */
-    USHORT              windGust;               /* ! mph                  */
-    USHORT              windGustDir;            /* ! degrees              */
+    uint16_t            inHumidity;             /* ! percent              */
+    uint16_t            outHumidity;            /* ! percent              */
+    uint16_t            windSpeed;              /* ! mph                  */
+    uint16_t            windDir;                /* ! degrees              */
+    uint16_t            windGust;               /* ! mph                  */
+    uint16_t            windGustDir;            /* ! degrees              */
     float               rainRate;               /* ! in/hr                */
     float               sampleRain;             /* ! inches               */
     float               sampleET;               /* ! ET                   */
-    USHORT              radiation;              /* ! watts/m^3            */
+    uint16_t            radiation;              /* ! watts/m^3            */
     float               UV;                     /* ! UV index             */
     float               dewpoint;               /* ! degrees F            */
     float               windchill;              /* ! degrees F            */
@@ -257,7 +252,7 @@ typedef struct
 
     // computed values - station should not alter these
     float               stormRain;              /* inches                 */
-    time_t              stormStart;             /* time_t                 */
+    int32_t             stormStart;             /* time_t                 */
     float               dayRain;                /* inches                 */
     float               monthRain;              /* inches                 */
     float               yearRain;               /* inches                 */
@@ -265,18 +260,18 @@ typedef struct
     float               monthET;                /* inches                 */
     float               yearET;                 /* inches                 */
     float               intervalAvgWCHILL;      /* degrees F              */
-    USHORT              intervalAvgWSPEED;      /* mph                    */
-    USHORT              yearRainMonth;          /* 1-12 Rain Start Month  */
+    uint16_t            intervalAvgWSPEED;      /* mph                    */
+    uint16_t            yearRainMonth;          /* 1-12 Rain Start Month  */
 
     // --- The following may or may not be supported for a given station ---
 
     // Vantage Pro
-    USHORT              rxCheckPercent;         /* 0 - 100                */
-    USHORT              tenMinuteAvgWindSpeed;  /* mph                    */
-    USHORT              forecastIcon;           /* VP only                */
-    USHORT              forecastRule;           /* VP only                */
-    USHORT              txBatteryStatus;        /* VP only                */
-    USHORT              consBatteryVoltage;     /* VP only                */
+    uint16_t            rxCheckPercent;         /* 0 - 100                */
+    uint16_t            tenMinuteAvgWindSpeed;  /* mph                    */
+    uint16_t            forecastIcon;           /* VP only                */
+    uint16_t            forecastRule;           /* VP only                */
+    uint16_t            txBatteryStatus;        /* VP only                */
+    uint16_t            consBatteryVoltage;     /* VP only                */
     float               extraTemp1;             /* degrees F              */
     float               extraTemp2;             /* degrees F              */
     float               extraTemp3;             /* degrees F              */
@@ -286,12 +281,12 @@ typedef struct
     float               soilTemp4;              /* degrees F              */
     float               leafTemp1;              /* degrees F              */
     float               leafTemp2;              /* degrees F              */
-    UCHAR               extraHumid1;            /* percent                */
-    UCHAR               extraHumid2;            /* percent                */
-    UCHAR               soilMoist1;
-    UCHAR               soilMoist2;
-    UCHAR               leafWet1;
-    UCHAR               leafWet2;
+    uint8_t             extraHumid1;            /* percent                */
+    uint8_t             extraHumid2;            /* percent                */
+    uint8_t             soilMoist1;
+    uint8_t             soilMoist2;
+    uint8_t             leafWet1;
+    uint8_t             leafWet2;
 
     // Vaisala WXT-510
     float               wxt510Hail;             /* inches                 */
@@ -308,42 +303,41 @@ typedef struct
 
     // WMR918/968
     float               wmr918Pool;             /* degrees F              */
-    UCHAR               wmr918Humid3;           /* percent                */
-    UCHAR               wmr918Tendency;         /* WMR's Forecast         */
-    UCHAR               wmr918WindBatteryStatus;
-    UCHAR               wmr918RainBatteryStatus;
-    UCHAR               wmr918OutTempBatteryStatus;
-    UCHAR               wmr918InTempBatteryStatus;
-    UCHAR               wmr918poolTempBatteryStatus;
-    UCHAR               wmr918extra1BatteryStatus;
-    UCHAR               wmr918extra2BatteryStatus;
-    UCHAR               wmr918extra3BatteryStatus;
+    uint8_t             wmr918Humid3;           /* percent                */
+    uint8_t             wmr918Tendency;         /* WMR's Forecast         */
+    uint8_t             wmr918WindBatteryStatus;
+    uint8_t             wmr918RainBatteryStatus;
+    uint8_t             wmr918OutTempBatteryStatus;
+    uint8_t             wmr918InTempBatteryStatus;
+    uint8_t             wmr918poolTempBatteryStatus;
+    uint8_t             wmr918extra1BatteryStatus;
+    uint8_t             wmr918extra2BatteryStatus;
+    uint8_t             wmr918extra3BatteryStatus;
 
     // Generic extra sensor and status support:
     float               extraTemp[WVIEW_NUM_EXTRA_SENSORS];
-    USHORT              extraHumidity[WVIEW_NUM_EXTRA_SENSORS];
-    UCHAR               windBatteryStatus;
-    UCHAR               rainBatteryStatus;
-    UCHAR               outTempBatteryStatus;
-    UCHAR               consoleBatteryStatus;
-    UCHAR               uvBatteryStatus;
-    UCHAR               solarBatteryStatus;
-    UCHAR               extraTempBatteryStatus[WVIEW_NUM_EXTRA_SENSORS];
+    uint16_t            extraHumidity[WVIEW_NUM_EXTRA_SENSORS];
+    uint8_t             windBatteryStatus;
+    uint8_t             rainBatteryStatus;
+    uint8_t             outTempBatteryStatus;
+    uint8_t             consoleBatteryStatus;
+    uint8_t             uvBatteryStatus;
+    uint8_t             solarBatteryStatus;
+    uint8_t             extraTempBatteryStatus[WVIEW_NUM_EXTRA_SENSORS];
 } LOOP_PKT;
 
 
 // ARCHIVE_PKT - define the ARCHIVE data format for IPM msgs and archive record
-//               processing
+//               processing:
 #define ARCHIVE_VALUE_NULL          -100000
 typedef struct
 {
     // minimum required fields - station must provide these:
-    time_t              dateTime;               /* record date and time        */
-    long                usUnits;                /* US units (0 or 1)           */
-    long                interval;               /* Archive Interval in minutes */
+    int32_t             dateTime;               /* record date and time        */
+    int32_t             usUnits;                /* US units (0 or 1)           */
+    int32_t             interval;               /* Archive Interval in minutes */
     float               value[DATA_INDEX_MAX];
-}
-ARCHIVE_PKT;
+} ARCHIVE_PKT;
 
 
 //  ... this retrieves historical summations from the dbsqliteArchiveGetAverages method
@@ -352,17 +346,16 @@ typedef struct
     int                 samples[DATA_INDEX_MAX];
     time_t              startTime;
     float               values[DATA_INDEX_MAX];
-}
-HISTORY_DATA;
+} HISTORY_DATA;
 
 
 //  ... this structure retrieves NOAA data from the dbsqliteNOAAGetDay utility
 //  ... and represents a record in the NOAA database wview-noaa.sdb
 typedef struct
 {
-    short           year;
-    short           month;
-    short           day;
+    int16_t         year;
+    int16_t         month;
+    int16_t         day;
     float           meanTemp;
     float           highTemp;
     char            highTempTime[8];
@@ -374,13 +367,8 @@ typedef struct
     float           avgWind;
     float           highWind;
     char            highWindTime[8];
-    int             domWindDir;
-}
-NOAA_DAY_REC;
-
-
-/*  ... API methods
-*/
+    int32_t         domWindDir;
+} NOAA_DAY_REC;
 
 
 #endif

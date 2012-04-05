@@ -757,9 +757,15 @@ install-data-hook:
 @INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/plus
 @INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/static
 @INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/standard
+@INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation
+@INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/plus
+@INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/static
+@INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/standard
 @INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/alarms
 @INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/rsyslog.d
+@INSTALL_DPKG_TRUE@	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/logrotate.d
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/debian/99-wview.conf $(DESTDIR)$(WV_SHARE_DIR)/etc/rsyslog.d
+@INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/debian/wview-logrotate $(DESTDIR)$(WV_SHARE_DIR)/etc/logrotate.d
 @INSTALL_DPKG_TRUE@	@echo "$(PACKAGE_VERSION)" > $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/wview-version
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/chrome/plus/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/chrome/plus
@@ -768,6 +774,9 @@ install-data-hook:
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/classic/plus/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/plus
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/classic/static/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/static
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/classic/standard/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/standard
+@INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/exfoliation/plus/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/plus
+@INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/exfoliation/static/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/static
+@INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/exfoliation/standard/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/standard
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/alarms/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/alarms
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/conf/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview
 @INSTALL_DPKG_TRUE@	cp -fp $(top_srcdir)/examples/html/chrome/standard/graphics.conf $(DESTDIR)$(WV_SHARE_DIR)/etc/wview
@@ -808,6 +817,10 @@ install-data-hook:
 @INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/plus; \
 @INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/static; \
 @INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/standard; \
+@INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation; \
+@INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/plus; \
+@INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/static; \
+@INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/standard; \
 @INSTALL_DPKG_FALSE@		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/alarms; \
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html; \
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/chrome/plus/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/chrome/plus; \
@@ -816,6 +829,9 @@ install-data-hook:
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/classic/plus/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/plus; \
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/classic/static/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/static; \
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/classic/standard/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/standard; \
+@INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/exfoliation/plus/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/plus; \
+@INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/exfoliation/static/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/static; \
+@INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/exfoliation/standard/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/standard; \
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/alarms/*.* $(DESTDIR)$(WV_CONFIG_DIR)/alarms; \
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/conf/*.* $(DESTDIR)$(WV_CONFIG_DIR); \
 @INSTALL_DPKG_FALSE@		cp -fp $(top_srcdir)/examples/html/chrome/standard/graphics.conf $(DESTDIR)$(WV_CONFIG_DIR); \
@@ -837,7 +853,7 @@ install-data-hook:
 @INSTALL_DPKG_FALSE@		echo ""; \
 @INSTALL_DPKG_FALSE@		echo "This is a first time install so the generation templates will be set to \"chrome-standard-US units\"."; \
 @INSTALL_DPKG_FALSE@		echo "To change this run \"wviewhtmlconfig\" to configure the template directory"; \
-@INSTALL_DPKG_FALSE@		echo "after you have configured wview for metric units."; \
+@INSTALL_DPKG_FALSE@		echo "after you have configured wview for metric units and/or extended data."; \
 @INSTALL_DPKG_FALSE@		echo ""; \
 @INSTALL_DPKG_FALSE@		echo "If you want start/stop control of wview from the Management Web Site"; \
 @INSTALL_DPKG_FALSE@		echo "(and you are comfortable giving the http server user account sudo privileges):"; \

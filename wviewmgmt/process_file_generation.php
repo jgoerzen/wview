@@ -32,6 +32,7 @@
         SqliteDBSetValue($dbID, 'HTMLGEN_METRIC_USE_RAIN_MM', 'yes');
     else
         SqliteDBSetValue($dbID, 'HTMLGEN_METRIC_USE_RAIN_MM', 'no');
+    SqliteDBSetValue($dbID, 'HTMLGEN_WIND_UNITS', $_POST['field_Generate_WindUnits']);
     if ($_POST['field_Generate_Dual_Units'][0] == "yes")
         SqliteDBSetValue($dbID, 'HTMLGEN_DUAL_UNITS', 'yes');
     else

@@ -5,6 +5,7 @@ wviewVersion=<!--wviewVersion--><br>
 wviewUpTime=<!--wviewUpTime--><br>
 <br>
 ############################ station info ############################<br>
+stationName=<!--stationName--><br>
 stationType=<!--stationType--><br>
 stationCity=<!--stationCity--><br>
 stationState=<!--stationState--><br>

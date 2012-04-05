@@ -127,12 +127,12 @@ extern char* dbsqliteArchiveGetPath (void);
 extern int dbsqliteArchiveStoreRecord (ARCHIVE_PKT* record);
 
 //  ... search the archive database for the most recent archive record date;
-//  ... returns time_t or ERROR if no archives found
+//  ... returns time or ERROR if no archives found
 extern time_t dbsqliteArchiveGetNewestTime (ARCHIVE_PKT* newestRecord);
 
 //  ... search the archive database for the next archive record after 'dateTime';
-//  ... returns new time_t or ERROR if no archive found
-extern time_t dbsqliteArchiveGetNextRecord (time_t dateTime, ARCHIVE_PKT* recordStore);
+//  ... returns new time or ERROR if no archive found
+extern time_t dbsqliteArchiveGetNextRecord (time_t  dateTime, ARCHIVE_PKT* recordStore);
 
 //  ... search the archive database for the archive record with timestamp 'dateTime';
 //  ... returns OK or ERROR if no archive record found
@@ -236,7 +236,7 @@ extern int dbsqliteHiLowStoreArchive
 extern int dbsqliteHiLowUpdateArchive (ARCHIVE_PKT* record);
 
 //  ... Retrieve the last HILOW hour in the database;
-//  ... Returns time_t or ERROR
+//  ... Returns time or ERROR
 extern time_t dbsqliteHiLowGetLastUpdate(void);
 
 

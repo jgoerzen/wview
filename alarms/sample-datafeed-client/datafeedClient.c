@@ -92,7 +92,7 @@ int main (int argc, char *argv[])
     LOOP_PKT        hostLoopData;
     ARCHIVE_PKT     archiveRecord;
     ARCHIVE_PKT     hostRecord;
-    ULONG           dateTime = 0;
+    uint32_t        dateTime = 0;
     void            (*alarmHandler)(int);
 
     printf("datafeedClient: Begin...\n");
@@ -124,7 +124,7 @@ int main (int argc, char *argv[])
         exit (1);
     }
 
-    // write out the ULONG dateTime for next record after that dateTime:
+    // write out the uint32_t dateTime for next record after that dateTime:
     // convert to network byte order:
     dateTime = 0;
     dateTime = htonl(dateTime);

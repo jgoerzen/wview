@@ -332,7 +332,7 @@ static int hilowInsertData(time_t timestamp, SENSOR_TYPES type, float value, flo
         }
         else
         {
-            radsqliteFieldSetBigIntValue(field, (ULONGLONG)hilowTime);
+            radsqliteFieldSetBigIntValue(field, (uint64_t)hilowTime);
         }
 
         field = radsqliteFieldGet(row, "low");
@@ -356,7 +356,7 @@ static int hilowInsertData(time_t timestamp, SENSOR_TYPES type, float value, flo
         }
         else
         {
-            radsqliteFieldSetBigIntValue(field, (ULONGLONG)timestamp);
+            radsqliteFieldSetBigIntValue(field, (uint64_t)timestamp);
         }
 
         field = radsqliteFieldGet(row, "high");
@@ -380,7 +380,7 @@ static int hilowInsertData(time_t timestamp, SENSOR_TYPES type, float value, flo
         }
         else
         {
-            radsqliteFieldSetBigIntValue(field, (ULONGLONG)timestamp);
+            radsqliteFieldSetBigIntValue(field, (uint64_t)timestamp);
         }
 
         field = radsqliteFieldGet(row, "whenHigh");
@@ -416,7 +416,7 @@ static int hilowInsertData(time_t timestamp, SENSOR_TYPES type, float value, flo
         }
         else
         {
-            radsqliteFieldSetBigIntValue(field, (ULONGLONG)1);
+            radsqliteFieldSetBigIntValue(field, (uint64_t)1);
         }
 
         // insert the row:
@@ -487,7 +487,7 @@ static int hilowInsertWindDir (time_t timestamp, int value)
         }
         else
         {
-            radsqliteFieldSetBigIntValue(field, (ULONGLONG)hilowTime);
+            radsqliteFieldSetBigIntValue(field, (uint64_t)hilowTime);
         }
 
         for (i = 0; i < WAVG_NUM_BINS; i ++)
@@ -505,11 +505,11 @@ static int hilowInsertWindDir (time_t timestamp, int value)
                 if (i == binIndex)
                 {
                     // This is our guy:
-                    radsqliteFieldSetBigIntValue(field, (ULONGLONG)1);
+                    radsqliteFieldSetBigIntValue(field, (uint64_t)1);
                 }
                 else
                 {
-                    radsqliteFieldSetBigIntValue(field, (ULONGLONG)0);
+                    radsqliteFieldSetBigIntValue(field, (uint64_t)0);
                 }
             }
         }
@@ -679,8 +679,8 @@ static int hilowUpdateTableWithSample (SENSOR_TYPES type, time_t timestamp, LOOP
 
 static int hilowGetDataTimeFrame
 (
-    time_t                  first,
-    time_t                  last,
+    int32_t                 first,
+    int32_t                 last,
     SENSOR_STORE*           sensors,
     SENSOR_TIMEFRAMES       timeFrame
 )
@@ -706,7 +706,7 @@ static int hilowGetDataTimeFrame
     {
         // grab the rows:
         sprintf (query, "SELECT * FROM %s WHERE dateTime >= '%d' AND dateTime < '%d' ORDER BY dateTime ASC", 
-                 sensorTables[index], (int)first, (int)last);
+                 sensorTables[index], first, last);
     
         // Execute the query:
         if (radsqlitedirectQuery(hilowDB, query, TRUE) == ERROR)
@@ -862,8 +862,9 @@ static void hilowInitPerRecord (ARCHIVE_PKT* rec, void* data)
 {
     struct tm           bknTime;
     SENSOR_TYPES        index;
+    time_t              Time = (time_t)rec->dateTime;
 
-    localtime_r(&rec->dateTime, &bknTime);
+    localtime_r(&Time, &bknTime);
     if (bknTime.tm_hour == 0 && 
         bknTime.tm_min == rec->interval)
     {
@@ -1270,8 +1271,9 @@ int dbsqliteHiLowInit(int update)
                  archiveTime = dbsqliteArchiveGetNextRecord(archiveTime, &archiveRec))
             {
                 LastArchiveTime = archiveTime;
-    
-                localtime_r(&archiveRec.dateTime, &bknTime);
+
+                time_t Time = (time_t)archiveRec.dateTime;
+                localtime_r(&Time, &bknTime);
                 if (bknTime.tm_hour == 0 && 
                     bknTime.tm_min == archiveRec.interval)
                 {

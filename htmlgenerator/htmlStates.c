@@ -53,7 +53,7 @@ static void processNewArchiveRecord (HTML_WORK *work, WVIEW_MSG_ARCHIVE_NOTIFY *
     float               gmtOffsetHours;
     int                 startmin, starthour, startday, startmonth, startyear;
     int                 i, DSTFlag;
-    short               tempShort;
+    int16_t             tempShort;
     time_t              ntime, baseTime;
     struct tm           locTime;
     int                 deltaArchiveIntervals;
@@ -366,7 +366,7 @@ int htmlIdleState (int state, void *stimulus, void *data)
 {
     STIM                *stim = (STIM *)stimulus;
     HTML_WORK           *work = (HTML_WORK *)data;
-    USHORT              year, month, day, hour, minute, second;
+    uint16_t            year, month, day, hour, minute, second;
     WVIEW_MSG_REQUEST   msg;
 
     switch (stim->type)
@@ -404,7 +404,7 @@ int htmlStationInfoState (int state, void *stimulus, void *data)
     long                        oldSecs, newSecs;
     int                         currDay, currMonth, currYear;
     float                       gmtOffsetHours;
-    short                       tempShort;
+    int16_t                     tempShort;
     FILE*                       indicateFile;
 
     ntime = time (NULL);

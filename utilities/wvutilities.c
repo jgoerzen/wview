@@ -44,11 +44,11 @@ static HeaderBlock      hostHeader;
 //// Local methods
 static char *buildArchiveFileName
 (
-    char    *path,
-    USHORT  date,
-    char    *store,
-    int     *yr,
-    int     *mo
+    char        *path,
+    uint16_t    date,
+    char        *store,
+    int         *yr,
+    int         *mo
 )
 {
     *yr = (date/100) + 2000;
@@ -66,9 +66,9 @@ static char *incrementArchiveFileName
     int     *mo
 )
 {
-    USHORT  year, month;
-    char    temp[32], path[256];
-    int     i;
+    uint16_t    year, month;
+    char        temp[32], path[256];
+    int         i;
 
     wvstrncpy (path, oldName, sizeof(path));
     for (i = strlen (oldName) - 1; i >= 0; i --)
@@ -412,7 +412,7 @@ static void convertDayRecords (FILE *inFile, FILE *outFile, HeaderBlock *header,
 int wvuConvertWLKFiles (char *srcDir, char *destDir, int doLE2BE)
 {
     char            sourceName[512], destName[512];
-    USHORT          fileDate;
+    uint16_t        fileDate;
     struct stat     fileStatus;
     FILE            *inFile, *outFile;
     int             retVal, year, month, dummyYear, dummyMonth;

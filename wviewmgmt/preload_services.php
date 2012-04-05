@@ -76,6 +76,13 @@
     }
     $field_Enable_wvpmond                   = SqliteDBGetValue($dbID, 'ENABLE_PROCMON');
 
+    $field_wviewd_Verbose = "no";
+    $field_htmlgend_Verbose = "no";
+    $field_wvalarmd_Verbose = "no";
+    $field_wviewftpd_Verbose = "no";
+    $field_wviewsshd_Verbose = "no";
+    $field_wvcwopd_Verbose = "no";
+    $field_wvhttpd_Verbose = "no";
     $verbosityMask = bindec(SqliteDBGetValue($dbID, 'STATION_VERBOSE_MSGS'));
     if (($verbosityMask & 0x01) != 0)
         $field_wviewd_Verbose = "yes";

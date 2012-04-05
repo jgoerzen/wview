@@ -155,6 +155,7 @@ sqlite3_export()
     echo ".mode list" > /tmp/commands.sql
     echo ".separator ," >> /tmp/commands.sql
     echo ".nullvalue '\N'" >> /tmp/commands.sql
+    echo ".timeout 30000" >> /tmp/commands.sql
     echo ".output $4" >> /tmp/commands.sql
     echo "select * from $2 where dateTime > '$3' order by dateTime ASC;" >> /tmp/commands.sql
     echo ".exit" >> /tmp/commands.sql

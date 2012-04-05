@@ -66,7 +66,7 @@ typedef struct
     char            daemonQname[128];
     char            wviewdir[128];
     TIMER_ID        timer;
-    ULONGLONG       msOffset;
+    uint64_t        msOffset;
     SSH_DATA        sshData;
     SSH_ID          sshId;
     int             exiting;

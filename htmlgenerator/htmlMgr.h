@@ -115,16 +115,16 @@ typedef struct
     int                 isMetricUnits;
     int                 archiveInterval;
     int                 isExtendedData;
-    short               sunrise;
-    short               sunset;
-    short               midday;
-    short               dayLength;
-    short               civilrise;
-    short               civilset;
-    short               astrorise;
-    short               astroset;
-    short               moonrise;
-    short               moonset;
+    int16_t             sunrise;
+    int16_t             sunset;
+    int16_t             midday;
+    int16_t             dayLength;
+    int16_t             civilrise;
+    int16_t             civilset;
+    int16_t             astrorise;
+    int16_t             astroset;
+    int16_t             moonrise;
+    int16_t             moonset;
     RADLIST             imgList;
     RADLIST             templateList;
     float               dayValues[DATA_INDEX_MAX][MAX_DAILY_NUM_VALUES];
@@ -189,9 +189,9 @@ extern HTML_MGR_ID htmlmgrInit
     char            *name,
     char            *city,
     char            *state,
-    short           elevation,
-    short           latitude,
-    short           longitude,
+    int16_t         elevation,
+    int16_t         latitude,
+    int16_t         longitude,
     char            *mphaseIncrease,
     char            *mphaseDecrease,
     char            *mphaseFull,

@@ -93,6 +93,7 @@ typedef struct _wview_medium
     int                 fd;
     int                 (*init) (struct _wview_medium *medium, char *deviceName);
     void                (*exit) (struct _wview_medium *medium);
+    int                 (*restart) (struct _wview_medium *medium);
     int                 (*read) (struct _wview_medium *medium, void *bfr, int len, int timeout);
     int                 (*write) (struct _wview_medium *medium, void *buffer, int length);
     void                (*flush) (struct _wview_medium *medium, int queue);
@@ -148,10 +149,10 @@ typedef struct
     float           stationRainYTDPreset;
     float           stationETYTDPreset;
     int             stationRainETPresetYear;
-    USHORT          archiveInterval;
-    short           latitude;
-    short           longitude;
-    short           elevation;
+    uint16_t        archiveInterval;
+    int16_t         latitude;
+    int16_t         longitude;
+    int16_t         elevation;
     time_t          archiveDateTime;
     time_t          nextArchiveTime;            // detect system clock changes
     TIMER_ID        archiveTimer;
@@ -159,8 +160,8 @@ typedef struct
     TIMER_ID        pushTimer;
     TIMER_ID        syncTimer;
     TIMER_ID        ifTimer;
-    ULONG           cdataInterval;
-    ULONG           pushInterval;
+    uint32_t        cdataInterval;
+    uint32_t        pushInterval;
     SENSOR_STORE    sensors;
     LOOP_PKT        loopPkt;                    // for IPM pkts
     int             numReadRetries;
@@ -205,6 +206,9 @@ typedef struct
 
 /*  !!!!!!!!!!!!!!!!!!!!  END HIDDEN SECTION  !!!!!!!!!!!!!!!!!!!!!
 */
+
+// Retrieve exit status:
+extern int wviewdIsExiting(void);
 
 
 #endif

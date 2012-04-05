@@ -316,7 +316,7 @@ static int noaaInsertData(time_t timestamp, SENSOR_STORE* sensorStore)
     }
     else
     {
-        radsqliteFieldSetBigIntValue(field, (ULONGLONG)noaaDayTime);
+        radsqliteFieldSetBigIntValue(field, (uint64_t)noaaDayTime);
     }
 
     field = radsqliteFieldGet(row, "meanTemp");
@@ -372,7 +372,7 @@ static int noaaInsertData(time_t timestamp, SENSOR_STORE* sensorStore)
         if (sensors[SENSOR_OUTTEMP].time_high > 0)
         {
             radsqliteFieldSetBigIntValue(field, 
-                                         (ULONGLONG)sensors[SENSOR_OUTTEMP].time_high);
+                                         (uint64_t)sensors[SENSOR_OUTTEMP].time_high);
         }
         else
         {
@@ -412,7 +412,7 @@ static int noaaInsertData(time_t timestamp, SENSOR_STORE* sensorStore)
         if (sensors[SENSOR_OUTTEMP].time_low > 0)
         {
             radsqliteFieldSetBigIntValue(field, 
-                                         (ULONGLONG)sensors[SENSOR_OUTTEMP].time_low);
+                                         (uint64_t)sensors[SENSOR_OUTTEMP].time_low);
         }
         else
         {
@@ -534,7 +534,7 @@ static int noaaInsertData(time_t timestamp, SENSOR_STORE* sensorStore)
         if (sensors[SENSOR_WGUST].time_high > 0)
         {
             radsqliteFieldSetBigIntValue(field, 
-                                         (ULONGLONG)sensors[SENSOR_WGUST].time_high);
+                                         (uint64_t)sensors[SENSOR_WGUST].time_high);
         }
         else
         {
@@ -554,7 +554,7 @@ static int noaaInsertData(time_t timestamp, SENSOR_STORE* sensorStore)
         if (sensors[SENSOR_WSPEED].samples > 0)
         {
             tempint = windAverageCompute(&sensorStore->wind[STF_DAY]);
-            radsqliteFieldSetBigIntValue(field, (ULONGLONG)tempint);
+            radsqliteFieldSetBigIntValue(field, (uint64_t)tempint);
         }
         else
         {

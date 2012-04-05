@@ -103,13 +103,13 @@ typedef struct
     float           pool;
     float           extraTemp[3];
     float           extraHumidity[3];
-    UCHAR           windBatteryStatus;
-    UCHAR           rainBatteryStatus;
-    UCHAR           outTempBatteryStatus;
-    UCHAR           inTempBatteryStatus;
-    UCHAR           poolTempBatteryStatus;
-    UCHAR           extraBatteryStatus[3];
-    UCHAR           tendency;
+    uint8_t         windBatteryStatus;
+    uint8_t         rainBatteryStatus;
+    uint8_t         outTempBatteryStatus;
+    uint8_t         inTempBatteryStatus;
+    uint8_t         poolTempBatteryStatus;
+    uint8_t         extraBatteryStatus[3];
+    uint8_t         tendency;
 
 } WMR918_DATA;
 
@@ -118,8 +118,8 @@ typedef struct
 typedef struct
 {
     WMR918_DATA     sensorData;
-    UCHAR           readData[WMR918_BUFFER_LENGTH];
-    UCHAR           dataRXMask;
+    uint8_t         readData[WMR918_BUFFER_LENGTH];
+    uint8_t         dataRXMask;
 } WMR918_WORK;
 
 

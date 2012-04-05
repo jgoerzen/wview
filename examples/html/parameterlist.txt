@@ -5,6 +5,7 @@
 <!--wviewUpTime-->
 
 ############################ station info ############################
+<!--stationName-->
 <!--stationType-->
 <!--stationCity-->
 <!--stationState-->
@@ -37,6 +38,8 @@
 <!--civilsetTime-->
 <!--astroriseTime-->
 <!--astrosetTime-->
+<!--moonriseTime-->
+<!--moonsetTime-->
 <!--insideTemp-->
 <!--insideHumidity-->
 <!--outsideTemp-->
@@ -123,9 +126,9 @@
 <!--wmr918OutTempBatteryStatus-->
 <!--wmr918InTempBatteryStatus-->
 <!--wmr918poolTempBatteryStatus-->
-<!--wmr918extra1TempBatteryStatus-->
-<!--wmr918extra2TempBatteryStatus-->
-<!--wmr918extra3TempBatteryStatus-->
+<!--wmr918extra1BatteryStatus-->
+<!--wmr918extra2BatteryStatus-->
+<!--wmr918extra3BatteryStatus-->
 
 
 ###################### Generic Extra Parameters #########################

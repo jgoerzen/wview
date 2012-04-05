@@ -70,9 +70,15 @@ if INSTALL_DPKG
 	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/plus
 	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/static
 	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/standard
+	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation
+	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/plus
+	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/static
+	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/standard
 	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/alarms
 	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/rsyslog.d
+	mkdir -p $(DESTDIR)$(WV_SHARE_DIR)/etc/logrotate.d
 	cp -fp $(top_srcdir)/debian/99-wview.conf $(DESTDIR)$(WV_SHARE_DIR)/etc/rsyslog.d
+	cp -fp $(top_srcdir)/debian/wview-logrotate $(DESTDIR)$(WV_SHARE_DIR)/etc/logrotate.d
 	@echo "$(PACKAGE_VERSION)" > $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/wview-version
 	cp -fp $(top_srcdir)/examples/html/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html
 	cp -fp $(top_srcdir)/examples/html/chrome/plus/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/chrome/plus
@@ -81,6 +87,9 @@ if INSTALL_DPKG
 	cp -fp $(top_srcdir)/examples/html/classic/plus/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/plus
 	cp -fp $(top_srcdir)/examples/html/classic/static/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/static
 	cp -fp $(top_srcdir)/examples/html/classic/standard/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/classic/standard
+	cp -fp $(top_srcdir)/examples/html/exfoliation/plus/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/plus
+	cp -fp $(top_srcdir)/examples/html/exfoliation/static/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/static
+	cp -fp $(top_srcdir)/examples/html/exfoliation/standard/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/html/exfoliation/standard
 	cp -fp $(top_srcdir)/examples/alarms/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview/alarms
 	cp -fp $(top_srcdir)/examples/conf/*.* $(DESTDIR)$(WV_SHARE_DIR)/etc/wview
 	cp -fp $(top_srcdir)/examples/html/chrome/standard/graphics.conf $(DESTDIR)$(WV_SHARE_DIR)/etc/wview
@@ -122,6 +131,10 @@ else
 		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/plus; \
 		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/static; \
 		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/standard; \
+		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation; \
+		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/plus; \
+		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/static; \
+		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/standard; \
 		mkdir -p $(DESTDIR)$(WV_CONFIG_DIR)/alarms; \
 		cp -fp $(top_srcdir)/examples/html/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html; \
 		cp -fp $(top_srcdir)/examples/html/chrome/plus/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/chrome/plus; \
@@ -130,6 +143,9 @@ else
 		cp -fp $(top_srcdir)/examples/html/classic/plus/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/plus; \
 		cp -fp $(top_srcdir)/examples/html/classic/static/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/static; \
 		cp -fp $(top_srcdir)/examples/html/classic/standard/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/classic/standard; \
+		cp -fp $(top_srcdir)/examples/html/exfoliation/plus/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/plus; \
+		cp -fp $(top_srcdir)/examples/html/exfoliation/static/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/static; \
+		cp -fp $(top_srcdir)/examples/html/exfoliation/standard/*.* $(DESTDIR)$(WV_CONFIG_DIR)/html/exfoliation/standard; \
 		cp -fp $(top_srcdir)/examples/alarms/*.* $(DESTDIR)$(WV_CONFIG_DIR)/alarms; \
 		cp -fp $(top_srcdir)/examples/conf/*.* $(DESTDIR)$(WV_CONFIG_DIR); \
 		cp -fp $(top_srcdir)/examples/html/chrome/standard/graphics.conf $(DESTDIR)$(WV_CONFIG_DIR); \
@@ -151,7 +167,7 @@ else
 		echo ""; \
 		echo "This is a first time install so the generation templates will be set to \"chrome-standard-US units\"."; \
 		echo "To change this run \"wviewhtmlconfig\" to configure the template directory"; \
-		echo "after you have configured wview for metric units."; \
+		echo "after you have configured wview for metric units and/or extended data."; \
 		echo ""; \
 		echo "If you want start/stop control of wview from the Management Web Site"; \
 		echo "(and you are comfortable giving the http server user account sudo privileges):"; \

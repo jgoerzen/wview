@@ -74,7 +74,7 @@ static char                 winddir[16][4] =
 
 //  ... ----- static (local) methods -----
 
-static int extractTimeValue (UCHAR *valarray, int index)
+static int extractTimeValue (uint8_t *valarray, int index)
 {
     int     fIndex;
     int     value;
@@ -99,7 +99,7 @@ static int extractTimeValue (UCHAR *valarray, int index)
     }
 }
 
-static int insertTimeValue (UCHAR *valarray, int index, USHORT value)
+static int insertTimeValue (uint8_t *valarray, int index, uint16_t value)
 {
     int     fIndex;
 
@@ -118,7 +118,7 @@ static int insertTimeValue (UCHAR *valarray, int index, USHORT value)
     return value;
 }
 
-static char *findDominantDirection (UCHAR *dirarray)
+static char *findDominantDirection (uint8_t *dirarray)
 {
     int         i;
     int         max = -1, index = -1, value;
@@ -142,7 +142,7 @@ static char *findDominantDirection (UCHAR *dirarray)
         return winddir[index];
 }
 
-static char *buildDayTimeFromIndex (UCHAR *valarray, int index, char *store)
+static char *buildDayTimeFromIndex (uint8_t *valarray, int index, char *store)
 {
     int         minutes;
 
@@ -162,11 +162,11 @@ static char *buildDayTimeFromIndex (UCHAR *valarray, int index, char *store)
 
 static char *buildArchiveFileName
 (
-    char    *path,
-    USHORT  date,
-    char    *store,
-    int     *yr,
-    int     *mo
+    char        *path,
+    uint16_t    date,
+    char        *store,
+    int         *yr,
+    int         *mo
 )
 {
     *yr = (date/100) + 2000;
@@ -184,9 +184,9 @@ static char *incrementArchiveFileName
     int     *mo
 )
 {
-    USHORT  year, month;
-    char    temp[32], path[256];
-    int     i;
+    uint16_t    year, month;
+    char        temp[32], path[256];
+    int         i;
 
     wvstrncpy (path, oldName, 256);
     for (i = strlen (oldName) - 1; i >= 0; i --)
@@ -269,9 +269,9 @@ static char *decrementArchiveFileName
     int     *mo
 )
 {
-    USHORT  year, month;
-    char    temp[32], path[256];
-    int     i;
+    uint16_t    year, month;
+    char        temp[32], path[256];
+    int         i;
 
     wvstrncpy (path, oldName, 256);
     for (i = strlen (oldName) - 1; i >= 0; i --)
@@ -536,7 +536,7 @@ static int convertSummaryFileToAscii (char *startName, int outfilefd, int yr, in
 
 static float    lastGoodTemp        = 680.0;
 static float    lastGoodHumid       = 500.0;
-static UCHAR    lastGoodExtraTemp   = 158;
+static uint8_t  lastGoodExtraTemp   = 158;
 static int      lastWDIR            = 0;
 
 #if defined(BUILD_HTMLGEND)
@@ -738,8 +738,8 @@ static int rollIntoAverages
                 arcRecord.windSpeed = 0;
             }
 
-            if ((USHORT)arcRecord.outsideTemp != 0x8000 &&
-                (USHORT)arcRecord.outsideTemp != 0x7FFF)
+            if ((uint16_t)arcRecord.outsideTemp != 0x8000 &&
+                (uint16_t)arcRecord.outsideTemp != 0x7FFF)
             {
                 lastGoodTemp = arcRecord.outsideTemp;
             }
@@ -748,9 +748,9 @@ static int rollIntoAverages
                 arcRecord.outsideTemp = lastGoodTemp;
             }
 
-            if ((USHORT)arcRecord.outsideHum != 0x8000 &&
-                (USHORT)arcRecord.outsideHum != 0x7FFF &&
-                (USHORT)arcRecord.outsideHum != 2550)
+            if ((uint16_t)arcRecord.outsideHum != 0x8000 &&
+                (uint16_t)arcRecord.outsideHum != 0x7FFF &&
+                (uint16_t)arcRecord.outsideHum != 2550)
             {
                 lastGoodHumid = arcRecord.outsideHum;
             }
@@ -810,7 +810,7 @@ static int rollIntoAverages
                     wvutilsConvertFToC (wvutilsCalculateHeatIndex ((float)arcRecord.outsideTemp/10.0,
                                                    (float)arcRecord.outsideHum/10.0));
 
-                if ((USHORT)arcRecord.solarRad != 0x7FFF && (USHORT)arcRecord.solarRad != 0xFFFF && (float)arcRecord.solarRad >= 0 && (float)arcRecord.solarRad <= 1800)
+                if ((uint16_t)arcRecord.solarRad != 0x7FFF && (uint16_t)arcRecord.solarRad != 0xFFFF && (float)arcRecord.solarRad >= 0 && (float)arcRecord.solarRad <= 1800)
                     store->values[DATA_INDEX_radiation] += (float)arcRecord.solarRad;
                 if (arcRecord.UV != 0xFF)
                     store->values[DATA_INDEX_UV] += (float)arcRecord.UV/10.0;
@@ -896,7 +896,7 @@ static int rollIntoAverages
                                                (float)arcRecord.outsideHum/10.0);
 
 
-                if ((USHORT)arcRecord.solarRad != 0x7FFF && (USHORT)arcRecord.solarRad != 0xFFFF && (float)arcRecord.solarRad >= 0 && (float)arcRecord.solarRad <= 1800)
+                if ((uint16_t)arcRecord.solarRad != 0x7FFF && (uint16_t)arcRecord.solarRad != 0xFFFF && (float)arcRecord.solarRad >= 0 && (float)arcRecord.solarRad <= 1800)
                     store->values[DATA_INDEX_radiation] += (float)arcRecord.solarRad;
                 if (arcRecord.UV != 0xFF)
                     store->values[DATA_INDEX_UV] += (float)arcRecord.UV/10.0;
@@ -1011,12 +1011,12 @@ static int computeNoaaDay
         {
             continue;
         }
-        if ((USHORT)arcRecord.outsideTemp == 0x8000 ||
-                (USHORT)arcRecord.outsideTemp == 0x7FFF ||
-                (USHORT)arcRecord.hiOutsideTemp == 0x8000 ||
-                (USHORT)arcRecord.hiOutsideTemp == 0x7FFF ||
-                (USHORT)arcRecord.lowOutsideTemp == 0x8000 ||
-                (USHORT)arcRecord.lowOutsideTemp == 0x7FFF)
+        if ((uint16_t)arcRecord.outsideTemp == 0x8000 ||
+                (uint16_t)arcRecord.outsideTemp == 0x7FFF ||
+                (uint16_t)arcRecord.hiOutsideTemp == 0x8000 ||
+                (uint16_t)arcRecord.hiOutsideTemp == 0x7FFF ||
+                (uint16_t)arcRecord.lowOutsideTemp == 0x8000 ||
+                (uint16_t)arcRecord.lowOutsideTemp == 0x7FFF)
         {
             continue;
         }
@@ -1089,8 +1089,8 @@ static int getNewestDateTime
     char            *startName,
     int             year,
     int             month,
-    USHORT          *date,
-    USHORT          *time,
+    uint16_t        *date,
+    uint16_t        *time,
     ArchiveRecord   *newRec
 )
 {
@@ -1153,8 +1153,8 @@ static int getNextRecord
     char            *startName,
     int             year,
     int             month,
-    USHORT          *date,
-    USHORT          *atime,
+    uint16_t        *date,
+    uint16_t        *atime,
     ArchiveRecord   *newRec
 )
 {
@@ -1299,7 +1299,7 @@ int dbfGetAverages
 )
 {
     char            startName[256];
-    USHORT          fileDate;
+    uint16_t        fileDate;
     struct stat     fileStatus;
     int             retVal, year, month;
     int             curyear, curmonth;
@@ -1395,7 +1395,7 @@ int dbfGetNoaaDay
 )
 {
     char            startName[256];
-    USHORT          fileDate;
+    uint16_t        fileDate;
     struct stat     fileStatus;
     int             retVal, year, month;
     int             curyear, curmonth;
@@ -1451,7 +1451,7 @@ int dbfWriteDailyArchiveReport
     struct stat     fileStatus;
     int             retVal, year, month, day, hour, minute;
     int             dummyYear, dummyMonth;
-    USHORT          start;
+    uint16_t        start;
     struct tm       locTime;
 
     localtime_r (&timeval, &locTime);
@@ -1627,7 +1627,7 @@ int dbfStoreArchiveRecord
     char            *archivePath,
     ARCHIVE_RECORD  *record,
     int             archiveInterval,
-    USHORT          RainCollectorType
+    uint16_t        RainCollectorType
 )
 {
     int             year, month, day, hour, minute, dayRecs, dayMinutes;
@@ -1636,7 +1636,7 @@ int dbfStoreArchiveRecord
     FILE            *arcFile;
     struct stat     fileStatus;
     HeaderBlock     hdrblk;
-    short           wind;
+    int16_t         wind;
     float           chill, dew, heat;
     struct tm       bknTime;
     time_t          secTime;
@@ -2147,17 +2147,17 @@ int dbfStoreArchiveRecord
 int dbfGetNewestArchiveTime
 (
     char            *archivePath,
-    USHORT          curMonth,
-    USHORT          curYear,
-    USHORT          *date,
-    USHORT          *time,
+    uint16_t        curMonth,
+    uint16_t        curYear,
+    uint16_t        *date,
+    uint16_t        *time,
     ArchiveRecord   *newestRecord
 )
 {
     char            startName[256], stopName[256];
     struct stat     fileStatus;
     int             year, month, done = FALSE;
-    USHORT          start, stop;
+    uint16_t        start, stop;
 
     start = ((curYear-2000)*100) + curMonth;
     stop = ((curYear-2001)*100) + curMonth;             // go back one year
@@ -2203,8 +2203,8 @@ int dbfCopyArchiveRecordToConsoleRecord
 (
     ArchiveRecord       *src,
     ARCHIVE_RECORD      *dest,
-    USHORT              date,
-    USHORT              time
+    uint16_t            date,
+    uint16_t            time
 )
 {
     memset (dest, 0, sizeof (*dest));
@@ -2280,15 +2280,15 @@ int dbfIncrementConsoleTime
 int dbfGetNextArchiveRecord
 (
     char            *archivePath,
-    USHORT          *date,
-    USHORT          *atime,
+    uint16_t        *date,
+    uint16_t        *atime,
     ArchiveRecord   *recordStore
 )
 {
     char            startName[256], stopName[256];
     struct stat     fileStatus;
     int             year, month, done = FALSE;
-    USHORT          start, tempDate, tempTime, tempMonth, tempYear, stop;
+    uint16_t        start, tempDate, tempTime, tempMonth, tempYear, stop;
     time_t          ntime;
     struct tm       tmtime;
 
@@ -2356,8 +2356,8 @@ int dbfGetNextArchiveRecord
 int dbfExportArchiveFile
 (
     char                *archivePath,
-    USHORT              start,
-    USHORT              stop,
+    uint16_t            start,
+    uint16_t            stop,
     char                *outputFilename
 )
 {
@@ -2416,8 +2416,8 @@ int dbfExportArchiveFile
 int dbfExportDailySummaryFile
 (
     char            *archivePath,
-    USHORT          start,
-    USHORT          stop,
+    uint16_t        start,
+    uint16_t        stop,
     char            *outputFilename
 )
 {
@@ -2469,10 +2469,10 @@ int dbfExportDailySummaryFile
 // dbfComputePackedDelta - compute the delta in minutes between 2 packed times
 int dbfComputePackedDelta
 (
-    USHORT          oldDate,
-    USHORT          oldTime,
-    USHORT          newDate,
-    USHORT          newTime
+    uint16_t        oldDate,
+    uint16_t        oldTime,
+    uint16_t        newDate,
+    uint16_t        newTime
 )
 {
     struct tm       oldTM, newTM;

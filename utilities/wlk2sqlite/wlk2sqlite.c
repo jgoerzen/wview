@@ -43,7 +43,7 @@ static void convertWLKToArchivePkt(ArchiveRecord* newRecord, ARCHIVE_PKT* archiv
     float           click;
 
     // create the time_t time for the record:
-    archivePkt->dateTime = timeStamp;
+    archivePkt->dateTime = (int32_t)timeStamp;
 
     archivePkt->usUnits  = 1;
     archivePkt->interval = newRecord->archiveInterval;
@@ -96,8 +96,8 @@ static void convertWLKToArchivePkt(ArchiveRecord* newRecord, ARCHIVE_PKT* archiv
         = wvutilsCalculateHeatIndex ((float)archivePkt->value[DATA_INDEX_outTemp],
                                      (float)archivePkt->value[DATA_INDEX_outHumidity]);
     archivePkt->value[DATA_INDEX_ET]             = (float)newRecord->ET/1000.0;
-    if ((USHORT)newRecord->solarRad != 0x7FFF && 
-        (USHORT)newRecord->solarRad != 0xFFFF && 
+    if ((uint16_t)newRecord->solarRad != 0x7FFF && 
+        (uint16_t)newRecord->solarRad != 0xFFFF && 
         (float)newRecord->solarRad >= 0 && 
         (float)newRecord->solarRad <= 1800)
     {
@@ -183,7 +183,7 @@ static void ConvertWlkToSqlite (char *srcDir, char *destDir)
 {
     time_t              timeStamp, diffTime, startTime = time(NULL);
     struct tm           buildTime;
-    USHORT              recdate, rectime;
+    uint16_t            recdate, rectime;
     ArchiveRecord       wlkPkt;
     ARCHIVE_PKT         sqlitePkt;
     int                 dups = 0, inserts = 0, errors = 0, lastminute = 0;

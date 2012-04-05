@@ -47,8 +47,8 @@
 // define our work area
 typedef struct
 {
-    USHORT          vendorId;
-    USHORT          productId;
+    uint16_t        vendorId;
+    uint16_t        productId;
     int             debug;
 } MEDIUM_USBHID;
 
@@ -60,8 +60,8 @@ typedef struct
 extern int usbhidMediumInit 
 (
     WVIEW_MEDIUM    *medium, 
-    USHORT          vendor_id, 
-    USHORT          product_id,
+    uint16_t        vendor_id, 
+    uint16_t        product_id,
     int             enableDebug
 );
 

@@ -30,7 +30,7 @@
   <h1>
 
     <a name="title"><strong>&nbsp;wview User Manual&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;May 22, 2011</strong></a></h1>
+        &nbsp;&nbsp;June 26, 2011</strong></a></h1>
 
   <!-- Table of Contents -->
   <h1 class="section">
@@ -377,7 +377,8 @@
         <li>US (Imperial) or Metric Units - can be easily configured for metric or US units
           of measure.</li>
         <li>SQLite Archive Storage - archive data is stored in an SQLite3 relational database.</li>
-        <li>Remote Upload - web pages and images can be transferred to a remote web server 
+        <li>Remote Upload - web pages and images can be transferred to a remote web server or other
+          <a href="http://www.webhostingsearch.com/dedicated-server.php">dedicated server</a> 
           via an ftp or secure ssh process included with wview.</li>
         <li>Alarms - the wview alarm daemon wvalarmd can be enabled to deliver current 
           conditions to TCP socket clients as a near real-time data feed engine. wvalarmd 
@@ -429,7 +430,8 @@
         <ul>
           <li>Serial</li>
 
-          <li>Ethernet - a terminal server or ethernet to serial server or WeatherlinkIP datalogger is required - 
+          <li>Ethernet - a terminal server or <a href="http://www.business.att.com/enterprise/Family/network-services/ethernet/"><b>ethernet</b></a>
+            to serial server or WeatherlinkIP datalogger is required - 
             set up as decribed above for the serial port and configured in transparent 
             data mode (no control character processing) with no packet delimiter. 
             wview allows you to specify the hostname and port of your serial server or WeatherlinkIP datalogger. 
@@ -567,11 +569,11 @@
       <a name="Installation-deb-apt"><strong>&nbsp;APT Installation</strong></a>
     </h2>
     <p>
-      The easiest method to install wview on a debian lenny or ubuntu/kubuntu 
+      The easiest method to install wview on a debian or ubuntu/kubuntu 
       server is to use the debian packages provided by the wviewweather.com
       APT repository:
       <ol>
-        <li>Architectures supported: i386, amd64, armel (limited)</li>
+        <li>Architectures supported: i386, amd64, armel, powerpc</li>
         <li>Add the wviewweather.com repository to your /etc/apt/sources.list:<br>
           Edit /etc/apt/sources.list and add the following lines to the bottom of 
           the file:<br><br>
@@ -583,8 +585,11 @@
                 <b>For debian lenny:</b><br>
                 deb       http://www.wviewweather.com/apt/lenny lenny main<br>
                 deb-src   http://www.wviewweather.com/apt/lenny lenny main<br>
-                deb       http://www.backports.org/debian lenny-backports main contrib non-free<br><br>
-
+                deb       http://backports.debian.org/debian-backports lenny-backports main contrib non-free<br><br>
+                <b>For debian squeeze:</b><br>
+                deb       http://www.wviewweather.com/apt/squeeze squeeze main<br>
+                deb-src   http://www.wviewweather.com/apt/squeeze squeeze main<br>
+                deb       http://backports.debian.org/debian-backports squeeze-backports main contrib non-free<br><br>
                 <b>For ubuntu/kubuntu jaunty:</b><br>
                 deb       http://www.wviewweather.com/apt/jaunty jaunty main<br>
                 deb-src   http://www.wviewweather.com/apt/jaunty jaunty main<br><br>
@@ -743,7 +748,7 @@
         </tr>
       </table>
       <!-- Shell Box End --><br>
-      You can also purge everything included generated data and configuration:<br><br>
+      You can also purge everything including generated data and configuration:<br><br>
       <!-- Shell Box Begin -->
       <table border="1" bgcolor="#d8d8d8" width="65%" cellspacing="0" cellpadding="2">
         <tr>
@@ -1184,8 +1189,10 @@
           <blockquote>
             <b>--prefix</b>&nbsp;&nbsp;&nbsp;(default: /usr/local) Controls 
             the installation root for wview.<br>
-            <b>--enable-http</b>&nbsp;&nbsp;&nbsp;(default: disabled) enables 
-            inclusion of the HTTP services daemon.<br>
+            <b>--prefix=/ --bindir=/usr/bin --sysconfdir=/etc --localstatedir=/var/lib --libdir=/usr/lib</b>&nbsp;&nbsp;&nbsp;
+              Configure options to use when building from source after a Debian APT installation. This places all binaries 
+              and support files in the same locations as the Debian package. This is handy when modifying source code or 
+              testing proposed releases.<br>
           </blockquote>
           A typical new installation:<br>
 
@@ -2118,9 +2125,9 @@
       wmr918OutTempBatteryStatus<br>
       wmr918InTempBatteryStatus<br>
       wmr918poolTempBatteryStatus<br>
-      wmr918extra1TempBatteryStatus<br>
-      wmr918extra2TempBatteryStatus<br>
-      wmr918extra3TempBatteryStatus<br><br>
+      wmr918extra1BatteryStatus<br>
+      wmr918extra2BatteryStatus<br>
+      wmr918extra3BatteryStatus<br><br>
     </p>
 
     <!-- Section 5 -->
@@ -2323,8 +2330,12 @@
       <!-- Shell Box End -->
       <br>
       Changes to extended data or web site skin selection is done using the
-      wviewhtmlconfig script provided with wview. It is interactive and will 
-      save your old $prefix/etc/wview/html directory to $prefix/etc/wview/html-DATE.TIME.
+      wviewhtmlconfig script provided with wview. If changing to extended data 
+      (adding UV, ET, radiation) first enable "Generate Extended Sensor Values?" 
+      on the wviewmgmt File Generation page (and save changes) prior to running
+      wviewhtmlconfig. It will automatically determine the extended data setting
+      from the configuration database. It is interactive and will save your old 
+      $prefix/etc/wview/html directory to $prefix/etc/wview/html-DATE.TIME.<br>
       As wview users contribute new skins they will be added to the wview distribution
       and supported by the wviewhtmlconfig script. For information on creating 
       your own skin, see the file "$prefix/etc/wview/html/Template-Skins-HOWTO.txt".

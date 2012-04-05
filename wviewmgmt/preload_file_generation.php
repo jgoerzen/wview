@@ -66,6 +66,7 @@
     $field_Generate_Interval                = SqliteDBGetValue($dbID, 'HTMLGEN_GENERATE_INTERVAL');
     $field_Generate_Metric                  = SqliteDBGetValue($dbID, 'HTMLGEN_METRIC_UNITS');
     $field_Generate_Metric_MM               = SqliteDBGetValue($dbID, 'HTMLGEN_METRIC_USE_RAIN_MM');
+    $field_Generate_WindUnits               = SqliteDBGetValue($dbID, 'HTMLGEN_WIND_UNITS');
     $field_Generate_Dual_Units              = SqliteDBGetValue($dbID, 'HTMLGEN_DUAL_UNITS');
     $field_Generate_Extended                = SqliteDBGetValue($dbID, 'HTMLGEN_EXTENDED_DATA');
     $field_Generate_Archive_Days            = SqliteDBGetValue($dbID, 'HTMLGEN_ARCHIVE_BROWSER_FILES_TO_KEEP');

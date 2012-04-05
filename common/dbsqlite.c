@@ -120,9 +120,9 @@ static float (*imperialToMetric_convertors[]) (float value) =
     wvutilsConvertFToC,
     noConversion,
     noConversion,
-    wvutilsConvertMPHToKPH,
+    wvutilsGetWindSpeed,
     noConversion,
-    wvutilsConvertMPHToKPH,
+    wvutilsGetWindSpeed,
     noConversion,
     wvutilsConvertRainINToMetric,
     wvutilsConvertRainINToMetric,
@@ -173,9 +173,9 @@ static float (*metricToImperial_convertors[]) (float value) =
     wvutilsConvertCToF,
     noConversion,
     noConversion,
-    wvutilsConvertKPHToMPH,
+    wvutilsGetWindSpeed,
     noConversion,
-    wvutilsConvertKPHToMPH,
+    wvutilsGetWindSpeed,
     noConversion,
     wvutilsConvertRainMetricToIN,
     wvutilsConvertRainMetricToIN,
@@ -249,7 +249,7 @@ static int getDBData(SQLITE_DIRECT_ROW row, ARCHIVE_PKT* data)
     }
     else
     {
-        data->dateTime = (time_t)radsqliteFieldGetBigIntValue(field);
+        data->dateTime = (int32_t)radsqliteFieldGetBigIntValue(field);
     }
 
     field = radsqlitedirectFieldGet(row, "usUnits");
@@ -318,7 +318,7 @@ static int insertDBData(ARCHIVE_PKT* data)
     }
     else
     {
-        radsqliteFieldSetBigIntValue(field, (ULONGLONG)data->dateTime);
+        radsqliteFieldSetBigIntValue(field, (uint64_t)data->dateTime);
     }
 
     field = radsqliteFieldGet(row, "usUnits");
@@ -330,7 +330,7 @@ static int insertDBData(ARCHIVE_PKT* data)
     }
     else
     {
-        radsqliteFieldSetBigIntValue(field, (ULONGLONG)data->usUnits);
+        radsqliteFieldSetBigIntValue(field, (uint64_t)data->usUnits);
     }
 
     field = radsqliteFieldGet(row, "interval");
@@ -342,7 +342,7 @@ static int insertDBData(ARCHIVE_PKT* data)
     }
     else
     {
-        radsqliteFieldSetBigIntValue(field, (ULONGLONG)data->interval);
+        radsqliteFieldSetBigIntValue(field, (uint64_t)data->interval);
     }
 
     for (index = DATA_INDEX_barometer; index < DATA_INDEX_MAX; index ++)
@@ -380,8 +380,8 @@ static int insertDBData(ARCHIVE_PKT* data)
 }
 
 static int lastWDIR;
+#if defined(BUILD_HTMLGEND) || defined(BUILD_WVIEWD)
 
-#if defined(BUILD_HTMLGEND)
 //  return num minutes processed or error
 static int rollIntoAverages
 (
@@ -463,18 +463,33 @@ static int rollIntoAverages
                     if (value > ARCHIVE_VALUE_NULL)
                     {
                         store->samples[index] += 1;
-    
-                        if (isMetricUnits & recordIsUSUnits)
+
+                        // Handle WIND separately:
+                        if (index == DATA_INDEX_windSpeed || index == DATA_INDEX_windGust)
                         {
-                            store->values[index] += (*imperialToMetric_convertors[index])(value);
-                        }
-                        else if (! isMetricUnits & ! recordIsUSUnits)
-                        {
-                            store->values[index] += (*metricToImperial_convertors[index])(value);
+                            if (recordIsUSUnits)
+                            {
+                                store->values[index] += wvutilsGetWindSpeed(value);
+                            }
+                            else
+                            {
+                                store->values[index] += wvutilsGetWindSpeedMetric(value);
+                            }
                         }
                         else
                         {
-                            store->values[index] += value;
+                            if (isMetricUnits & recordIsUSUnits)
+                            {
+                                store->values[index] += (*imperialToMetric_convertors[index])(value);
+                            }
+                            else if (! isMetricUnits & ! recordIsUSUnits)
+                            {
+                                store->values[index] += (*metricToImperial_convertors[index])(value);
+                            }
+                            else
+                            {
+                                store->values[index] += value;
+                            }
                         }
                     }
                 }
@@ -514,13 +529,11 @@ static int rollIntoAverages
         
     return mins;
 }
-
 #endif
 
 static time_t getNewestDateTime (ARCHIVE_PKT *newRec)
 {
     char                    query[DB_SQLITE_QUERY_LENGTH_MAX];
-    time_t                  endTime;
     SQLITE_DIRECT_ROW       rowDescr;
     SQLITE_FIELD_ID         field;
     time_t                  retVal;
@@ -593,7 +606,6 @@ static time_t getNewestDateTime (ARCHIVE_PKT *newRec)
 static int getNextRecord (time_t dateTime, ARCHIVE_PKT* newRec)
 {
     char                    query[DB_SQLITE_QUERY_LENGTH_MAX];
-    time_t                  endTime;
     SQLITE_DIRECT_ROW       rowDescr;
     SQLITE_FIELD_ID         field;
     time_t                  retVal;
@@ -843,7 +855,8 @@ char* dbsqliteArchiveGetPath (void)
     return DefaultArchivePath;
 }
 
-#if defined(BUILD_HTMLGEND)
+#if defined(BUILD_HTMLGEND) || defined(BUILD_WVIEWD)
+
 //  ... calculate averages over a given period of time
 //  ... (given in arcInterval minute samples);
 //  ... this will zero out the HISTORY_DATA store before beginning
@@ -882,6 +895,9 @@ int dbsqliteArchiveGetAverages
 
     return retVal;
 }
+#endif
+
+#if defined(BUILD_HTMLGEND)
 
 // write out all ASCII archive records for the given day to 'filename'
 int dbsqliteWriteDailyArchiveReport
@@ -906,7 +922,7 @@ int dbsqliteWriteDailyArchiveReport
     locTime.tm_min   = 0;
     locTime.tm_sec   = 0;
     locTime.tm_isdst = -1;
-    startTime = mktime(&locTime);
+    startTime = (time_t)mktime(&locTime);
     stopTime = startTime + WV_SECONDS_IN_DAY;
 
     if (stat (filename, &fileStatus) != -1)
@@ -1077,8 +1093,6 @@ int dbsqliteArchiveStoreRecord (ARCHIVE_PKT* record)
 
 
 //  ... search the archive path for the most recent archive record date;
-//  ... places the most recent date and time in 'date' and 'time' or all
-//  ... zero's if no archive record found;
 //  ... returns OK or ERROR if no archives found
 
 time_t dbsqliteArchiveGetNewestTime (ARCHIVE_PKT* newestRecord)
@@ -1091,13 +1105,13 @@ time_t dbsqliteArchiveGetNewestTime (ARCHIVE_PKT* newestRecord)
 
 
 //  ... search the archive database for the next archive record after 'dateTime';
-//  ... returns time_t of next record or ERROR if no archives found
+//  ... returns time of next record or ERROR if no archives found
 
 time_t dbsqliteArchiveGetNextRecord (time_t dateTime, ARCHIVE_PKT* recordStore)
 {
     time_t      retVal;
 
-    retVal = (time_t)getNextRecord(dateTime, recordStore);
+    retVal = getNextRecord(dateTime, recordStore);
     return retVal;
 }
 

@@ -168,7 +168,7 @@ int main (int argc, char *argv[])
 {
     int         baudIndex, parityIndex, stopIndex, sizeIndex, dtrEnable = TRUE;
     char        *tptr, host[128], port[16], buffer[WVIEW_MAX_PATH];
-    ULONG       (*radsysFptr) (UCHAR systemID);
+    ULONG       (*radsysFptr) (uint8_t systemID);
     
     if (argc < 2)
     {
@@ -326,3 +326,10 @@ int main (int argc, char *argv[])
     (*(wvWork.medium.exit)) (&wvWork.medium);
     exit (2);
 }
+
+// Retrieve exit status:
+int wviewdIsExiting(void)
+{
+    return wvWork.exiting;
+}
+

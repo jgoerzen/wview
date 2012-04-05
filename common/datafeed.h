@@ -68,14 +68,14 @@
 
 
 #ifdef DATAFEED_INSTANTIATE
-const USHORT DF_LOOP_START_FRAME[4] = 
+const uint16_t DF_LOOP_START_FRAME[4] = 
 {
     0xF388, 
     0xC6A2, 
     0xDADA, 
     0x0001
 };
-const USHORT DF_ARCHIVE_START_FRAME[4] = 
+const uint16_t DF_ARCHIVE_START_FRAME[4] = 
 {
     0xF388, 
     0xC6A2, 
@@ -85,7 +85,7 @@ const USHORT DF_ARCHIVE_START_FRAME[4] =
 
 // This one is sent by the client to request the next archive record after the
 // dateTime submitted; allows the client to synchronize archive data:
-const USHORT DF_RQST_ARCHIVE_START_FRAME[4] = 
+const uint16_t DF_RQST_ARCHIVE_START_FRAME[4] = 
 {
     0xF388, 
     0xC6A2, 
@@ -93,9 +93,9 @@ const USHORT DF_RQST_ARCHIVE_START_FRAME[4] =
     0x0003
 };
 #else
-extern const USHORT DF_LOOP_START_FRAME[4]; 
-extern const USHORT DF_ARCHIVE_START_FRAME[4]; 
-extern const USHORT DF_RQST_ARCHIVE_START_FRAME[4];
+extern const uint16_t DF_LOOP_START_FRAME[4]; 
+extern const uint16_t DF_ARCHIVE_START_FRAME[4]; 
+extern const uint16_t DF_RQST_ARCHIVE_START_FRAME[4];
 #endif
 
 

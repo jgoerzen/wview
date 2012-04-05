@@ -160,7 +160,7 @@ static void decodeTemp (unsigned char *ptr)
         dew   = wvutilsConvertCToF(d2temp(ptr[4], ptr[5]));
 
         // Sanity check the values:
-        if ((humid > 100) || (temp < -150) || (temp > 150) || (dew < -150) || (dew > 150))
+        if ((humid > 100) || (temp < -150) || (temp > 150))
         {
             // this packet is bogus:
             return;
@@ -214,11 +214,12 @@ static void decodeUV (unsigned char *ptr)
     }
     else
     {
-        wmrWork.sensorData.UV = ptr[0] & 0x0F;
+        wmrWork.sensorData.UV = (int)(ptr[0] & 0x0F);
+radMsgLog(PRI_MEDIUM, "WMRUSB: received UV: %2.2X", (unsigned int)ptr[0]);
     }
 }
 
-static int IsFFFFPacketStart (UCHAR* value)
+static int IsFFFFPacketStart (uint8_t* value)
 {
     if (value[0] == 0xFF && value[1] == 0xFF)
         return TRUE;
@@ -226,7 +227,7 @@ static int IsFFFFPacketStart (UCHAR* value)
         return FALSE;
 }
 
-static int IsD0PacketStart (UCHAR value)
+static int IsD0PacketStart (uint8_t value)
 {
     if (0xD2 <= value && value <= 0xD7)
         return TRUE;
@@ -236,7 +237,7 @@ static int IsD0PacketStart (UCHAR value)
     return FALSE;
 }
 
-static int IsPacketStart (UCHAR* pValue)
+static int IsPacketStart (uint8_t* pValue)
 {
     if (wmrWork.protocol == WMR_PROTOCOL_FFFF)
     {
@@ -269,7 +270,7 @@ static int getFFFFPktLength(int type)
     }
 }
 
-static int checkD0PktLength(UCHAR type, UCHAR length)
+static int checkD0PktLength(uint8_t type, uint8_t length)
 {
     switch ((int)type)
     {
@@ -333,7 +334,7 @@ static void shiftUpReadBuffer(int numToShift)
 
 static int parseStationData (WVIEWD_WORK *work)
 {
-    UCHAR   *ptr = &wmrWork.readData[0];
+    uint8_t   *ptr = &wmrWork.readData[0];
 
     if (wmrWork.protocol == WMR_PROTOCOL_FFFF)
     {
@@ -367,7 +368,7 @@ static int parseStationData (WVIEWD_WORK *work)
                 radthreadLock();
                 wmrWork.lastDataRX = radTimeGetSECSinceEpoch();
                 radthreadUnlock();
-                decodeUV(ptr+4);
+                decodeUV(ptr+5);
                 break;
             default:
                 break;
@@ -464,29 +465,29 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WMR_DATA *src)
     {
         tempfloat = src->humidity[WMR_TEMP_SENSOR_OUT];
         tempfloat += 0.5;
-        dest->outHumidity  = (USHORT)tempfloat;
+        dest->outHumidity  = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windAvgSpeed && src->windAvgSpeed <= 250)
     {
         tempfloat = src->windAvgSpeed;
         tempfloat += 0.5;
-        dest->windSpeed  = (USHORT)tempfloat;
+        dest->windSpeed  = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windDir && src->windDir <= 360)
     {
         tempfloat = src->windDir;
         tempfloat += 0.5;
-        dest->windDir        = (USHORT)tempfloat;
-        dest->windGustDir    = (USHORT)tempfloat;
+        dest->windDir        = (uint16_t)tempfloat;
+        dest->windGustDir    = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windGustSpeed && src->windGustSpeed <= 250)
     {
         tempfloat = src->windGustSpeed;
         tempfloat += 0.5;
-        dest->windGust    = (USHORT)tempfloat;
+        dest->windGust    = (uint16_t)tempfloat;
     }
 
     if (0 <= src->rainAccum)
@@ -528,7 +529,7 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WMR_DATA *src)
     dest->inTemp                        = src->temp[WMR_TEMP_SENSOR_IN];
     tempfloat                           = src->humidity[WMR_TEMP_SENSOR_IN];
     tempfloat += 0.5;
-    dest->inHumidity                    = (USHORT)tempfloat;
+    dest->inHumidity                    = (uint16_t)tempfloat;
 
     dest->UV                            = src->UV;
 
@@ -569,7 +570,7 @@ static int sendReset(WVIEWD_WORK *work)
 static void readDataDirect (WVIEWD_WORK *work)
 {
     int     retVal, length;
-    UCHAR   buf[8];
+    uint8_t buf[8];
 
     if (wmrWork.reopenNeeded)
     {
@@ -685,9 +686,9 @@ static int detectStationProtocol (WVIEWD_WORK *work)
 static void ReaderThread(RAD_THREAD_ID threadId, void* threadData)
 {
     int                 retVal, length, sendMsgFlag;
-    ULONG               lastDataTime;
+    uint32_t            lastDataTime;
     WMRUSB_MSG_DATA     msg;
-    UCHAR               buf[8];
+    uint8_t             buf[8];
     WVIEWD_WORK*        work = (WVIEWD_WORK*)threadData;
 
     radMsgLog (PRI_STATUS, "wmr: read thread started...");
@@ -829,11 +830,11 @@ int wmrInit (WVIEWD_WORK *work)
     radMsgLog (PRI_MEDIUM, 
         "wmrInit: waiting for first sensor packets (this may take some time):");
     radMsgLog (PRI_MEDIUM,
-        "wview requires one packet from each sensor suite before it can complete initialization.");
+        "wview requires one packet from each sensor suite (except rain) before it can complete initialization.");
     radMsgLog (PRI_MEDIUM, 
         "If one of your sensors is out of range or malfunctioning, wview will not complete initialization.");
     printCounter = 5000;
-    while ((wmrWork.dataRXMask != WMR_SENSOR_ALL) && (! work->exiting))
+    while ((wmrWork.dataRXMask < WMR_SENSOR_ALL) && (! work->exiting))
     {
         if (++printCounter >= 5000/(250 + WMR_PROCESS_TIME_INTERVAL))
         {

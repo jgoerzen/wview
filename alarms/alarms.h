@@ -134,7 +134,7 @@ typedef struct
                                         // else it is a lower bound
     float           bound;
     int             abateSecs;          // alarm abatement after trigger
-    ULONG           abateStart;
+    uint32_t        abateStart;
     char            scriptToRun[WVIEW_ALARM_SCRIPT_LENGTH];
     int             triggered;          // to prevent repeat notifications
     float           triggerValue;

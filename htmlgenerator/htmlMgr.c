@@ -54,7 +54,7 @@ char sampleHourLabels[MAX_DAILY_NUM_VALUES][8];
 #define DEBUG_GENERATION            FALSE
 
 static HTML_MGR     mgrWork;
-static ULONGLONG    GenerateTime;
+static uint64_t     GenerateTime;
 
 
 
@@ -453,9 +453,9 @@ HTML_MGR_ID htmlmgrInit
     char            *name,
     char            *city,
     char            *state,
-    short           elevation,
-    short           latitude,
-    short           longitude,
+    int16_t         elevation,
+    int16_t         latitude,
+    int16_t         longitude,
     char            *mphaseIncrease,
     char            *mphaseDecrease,
     char            *mphaseFull,
@@ -830,7 +830,7 @@ int htmlmgrGenerate
     }
 
     wvutilsLogEvent(PRI_STATUS, "Generated: %u ms: %d images, %d template files",
-                    (ULONG)(radTimeGetMSSinceEpoch() - GenerateTime), imgs, htmls);
+                    (uint32_t)(radTimeGetMSSinceEpoch() - GenerateTime), imgs, htmls);
 
     id->imagesGenerated += imgs;
     id->templatesGenerated += htmls;
@@ -882,7 +882,6 @@ int htmlmgrHistoryInit (HTML_MGR_ID id)
     // first, figure out our start label indexes and populate the history arrays
     // for each of day, week, month and year:
 
-    
     // do the samples in the last day:
     id->dayStart = wvutilsGetDayStartTime(id->archiveInterval);
 

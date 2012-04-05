@@ -45,6 +45,15 @@ SQLD_PID=$RUN_DIRECTORY/wviewsqld.pid
 RADROUTER_PID=$RUN_DIRECTORY/radmrouted.pid
 PMOND_PID=$RUN_DIRECTORY/wvpmond.pid
 
+wait_for_time_set() {
+    THOUSAND=1000
+    CURRVAL=`date +%s`
+    while [ "$CURRVAL" -lt "$THOUSAND" ]; do
+        sleep 1
+        CURRVAL=`date +%s`
+    done
+}
+
 kill_running_processes() {
 	if [ -f $RADROUTER_PID ]; then
 		echo "radlib router pid file $RADROUTER_PID exists - killing existing process"
@@ -96,6 +105,8 @@ kill_running_processes() {
 case "$1" in
   start)
 	kill_running_processes
+
+	wait_for_time_set
 
 	echo "Starting wview daemons:"
 

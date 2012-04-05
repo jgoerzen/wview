@@ -483,7 +483,6 @@ static int generateWind (HTML_IMG *img)
     sprintf (temp, "%s/%s", img->mgrWork->imagePath, img->fname);
 
     retVal = htmlGenPngDialWind (temp,
-                    img->mgrWork->isMetricUnits,
                     (int)img->mgrWork->loopStore.windDir,
                     (int)sensorGetDailyWhenHigh(img->mgrWork->hilowStore.sensor, SENSOR_WGUST),
                     (float)img->mgrWork->loopStore.windSpeed,
@@ -1106,6 +1105,11 @@ static int generateWSpeedDay (HTML_IMG *img)
 {
     int         i, j;
     char        temp[256];
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_SAMPLE))
     {
@@ -1135,7 +1139,7 @@ static int generateWSpeedDay (HTML_IMG *img)
                      DAILY_NUM_VALUES(img->mgrWork),
                      DAILY_NUM_VALUES(img->mgrWork),
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -1148,6 +1152,11 @@ static int generateWSpeedWeek (HTML_IMG *img)
     char        temp[256];
     time_t      ntime = img->mgrWork->weekStartTime_T;
     struct tm   loctime;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_HOUR))
     {
@@ -1200,7 +1209,7 @@ static int generateWSpeedWeek (HTML_IMG *img)
                      WEEKLY_NUM_VALUES-skipNo,
                      WEEKLY_NUM_VALUES,
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -1213,6 +1222,11 @@ static int generateWSpeedMonth (HTML_IMG *img)
     char        temp[256];
     time_t      ntime = img->mgrWork->monthStartTime_T;
     struct tm   loctime;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_HOUR))
     {
@@ -1265,7 +1279,7 @@ static int generateWSpeedMonth (HTML_IMG *img)
                      MONTHLY_NUM_VALUES-skipNo,
                      MONTHLY_NUM_VALUES,
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -1278,6 +1292,11 @@ static int generateWSpeedYear (HTML_IMG *img)
     char        temp[256];
     time_t      ntime = img->mgrWork->yearStartTime_T;
     struct tm   loctime;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_DAY))
     {
@@ -1307,7 +1326,7 @@ static int generateWSpeedYear (HTML_IMG *img)
                      YEARLY_NUM_VALUES,
                      YEARLY_NUM_VALUES,
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -1512,6 +1531,11 @@ static int generateHiWSpeedDay (HTML_IMG *img)
 {
     int         i, j;
     char        temp[256];
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_SAMPLE))
     {
@@ -1541,7 +1565,7 @@ static int generateHiWSpeedDay (HTML_IMG *img)
                      DAILY_NUM_VALUES(img->mgrWork),
                      DAILY_NUM_VALUES(img->mgrWork),
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -1554,6 +1578,11 @@ static int generateHiWSpeedWeek (HTML_IMG *img)
     char        temp[256];
     time_t      ntime = img->mgrWork->weekStartTime_T;
     struct tm   loctime;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_HOUR))
     {
@@ -1606,7 +1635,7 @@ static int generateHiWSpeedWeek (HTML_IMG *img)
                      WEEKLY_NUM_VALUES-skipNo,
                      WEEKLY_NUM_VALUES,
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -1619,6 +1648,11 @@ static int generateHiWSpeedMonth (HTML_IMG *img)
     char        temp[256];
     time_t      ntime = img->mgrWork->monthStartTime_T;
     struct tm   loctime;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_HOUR))
     {
@@ -1671,7 +1705,7 @@ static int generateHiWSpeedMonth (HTML_IMG *img)
                      MONTHLY_NUM_VALUES-skipNo,
                      MONTHLY_NUM_VALUES,
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -1684,6 +1718,11 @@ static int generateHiWSpeedYear (HTML_IMG *img)
     char        temp[256];
     time_t      ntime = img->mgrWork->yearStartTime_T;
     struct tm   loctime;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_DAY))
     {
@@ -1713,7 +1752,7 @@ static int generateHiWSpeedYear (HTML_IMG *img)
                      YEARLY_NUM_VALUES,
                      YEARLY_NUM_VALUES,
                      img->title,
-                     img->units,
+                     units,
                      img->decimalPlaces,
                      img->mgrWork->dateFormat,
                      img->mgrWork->isDualUnits));
@@ -3667,6 +3706,11 @@ static int generateCompositeWindDay (HTML_IMG *img)
     char        temp[256];
     MC_DATASET  datasets[2];
     float       min = 10000.0, max = -10000.0;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_SAMPLE))
     {
@@ -3741,7 +3785,7 @@ static int generateCompositeWindDay (HTML_IMG *img)
                           labels,
                           DAILY_NUM_VALUES(img->mgrWork),
                           DAILY_NUM_VALUES(img->mgrWork),
-                          img->units,
+                          units,
                           img->decimalPlaces,
                           img->mgrWork->dateFormat,
                           img->mgrWork->isDualUnits));
@@ -3756,6 +3800,11 @@ static int generateCompositeWindWeek (HTML_IMG *img)
     struct tm   loctime;
     float       min = 10000.0, max = -10000.0;
     MC_DATASET  datasets[2];
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_HOUR))
     {
@@ -3845,7 +3894,7 @@ static int generateCompositeWindWeek (HTML_IMG *img)
                           labels,
                           WEEKLY_NUM_VALUES-skipNo,
                           WEEKLY_NUM_VALUES,
-                          img->units,
+                          units,
                           img->decimalPlaces,
                           img->mgrWork->dateFormat,
                           img->mgrWork->isDualUnits));
@@ -3860,6 +3909,11 @@ static int generateCompositeWindMonth (HTML_IMG *img)
     struct tm   loctime;
     float       min = 10000.0, max = -10000.0;
     MC_DATASET  datasets[2];
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_HOUR))
     {
@@ -3949,7 +4003,7 @@ static int generateCompositeWindMonth (HTML_IMG *img)
                           labels,
                           MONTHLY_NUM_VALUES-skipNo,
                           MONTHLY_NUM_VALUES,
-                          img->units,
+                          units,
                           img->decimalPlaces,
                           img->mgrWork->dateFormat,
                           img->mgrWork->isDualUnits));
@@ -3964,6 +4018,11 @@ static int generateCompositeWindYear (HTML_IMG *img)
     struct tm   loctime;
     MC_DATASET  datasets[2];
     float       min = 10000.0, max = -10000.0;
+    char        units[16];
+
+    // Make units consistent with global preference:
+    strncpy(units, wvutilsGetWindUnitLabel(), 15);
+    strncpy(img->units, units, 15);
 
     if (!(img->mgrWork->newArchiveMask & NEW_ARCHIVE_DAY))
     {
@@ -4038,7 +4097,7 @@ static int generateCompositeWindYear (HTML_IMG *img)
                           labels,
                           YEARLY_NUM_VALUES,
                           YEARLY_NUM_VALUES,
-                          img->units,
+                          units,
                           img->decimalPlaces,
                           img->mgrWork->dateFormat,
                           img->mgrWork->isDualUnits));

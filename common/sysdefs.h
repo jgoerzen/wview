@@ -32,6 +32,9 @@
 #include <unistd.h>
 
 #include "config.h"
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 #include <radsysdefs.h>
 #include <radmsgLog.h>
 
@@ -149,6 +152,8 @@
 #define WV_SECONDS_IN_YEAR              (365*WV_SECONDS_IN_DAY)
 #define WV_MINUTES_IN_DAY               1440
 #define WV_MINUTES_IN_YEAR              (365*WV_MINUTES_IN_DAY)
+#define SECONDS_IN_INTERVAL(x)          (x * 60)
+
 
 // packed time utilities
 #define EXTRACT_PACKED_YEAR(x)          ((((x) >> 9) & 0x3F) + 2000)
@@ -211,9 +216,23 @@ enum _verbosity_bits
     WV_VERBOSE_WVWUNDERD    = 0x40,
     WV_VERBOSE_ALL          = 0x7F
 };
-    
+
+// Define wind units enumerations:
+typedef enum
+{
+    HTML_WINDUNITS_MPH              = 0,
+    HTML_WINDUNITS_MS,
+    HTML_WINDUNITS_KNOTS,
+    HTML_WINDUNITS_KMH
+} HTML_WUNITS;
+
+extern void wvutilsSetWindUnits(HTML_WUNITS units);
+extern char* wvutilsGetWindUnitLabel(void);
+extern float wvutilsGetWindSpeed(float mph);
+extern float wvutilsGetWindSpeedMetric(float kph);
+
 // wvconfigInit() must have been called before calling this:
-extern int  wvutilsSetVerbosity (USHORT daemonBitMask);
+extern int  wvutilsSetVerbosity (uint16_t daemonBitMask);
 
 extern int wvutilsToggleVerbosity (void);
 extern void wvutilsLogEvent (int priority, char *format, ...);
@@ -231,13 +250,17 @@ extern float wvutilsConvertFToC (float fahrenValue);
 extern float wvutilsConvertCToF (float celsiusValue);
 extern float wvutilsConvertDeltaFToC (float fahrenValue);
 extern float wvutilsConvertMPHToKPH (float mph);
-extern float wvutilsConvertKPHToMPH (float kph);
 extern float wvutilsConvertMPHToMPS (float mph);
 extern float wvutilsConvertMPHToKnots (float mph);
+extern float wvutilsConvertKPHToMPH (float kph);
+extern float wvutilsConvertKPHToMPS (float kph);
+extern float wvutilsConvertKPHToKnots (float kph);
 extern float wvutilsConvertMPSToKPH (float mps);
 extern float wvutilsConvertMPSToMPH (float mps);
+extern float wvutilsConvertMPSToKnots (float mps);
 extern float wvutilsConvertKnotsToKPH (float mps);
 extern float wvutilsConvertKnotsToMPH (float mps);
+extern float wvutilsConvertKnotsToMPS (float mps);
 extern float wvutilsConvertINHGToHPA (float inches);
 extern float wvutilsConvertHPAToINHG (float mb);
 extern float wvutilsConvertRainINToMetric (float inches);
@@ -271,21 +294,21 @@ extern float wvutilsCalculateApparentTemp(float temp, float windspeed, float hum
 
 
 // convert packed date/time to time_t
-extern time_t wvutilsPackedTimeToTimeT (USHORT packedDate, USHORT packedTime);
+extern time_t wvutilsPackedTimeToTimeT (uint16_t packedDate, uint16_t packedTime);
 
 // calculate the time difference in packed date/time format
 // does not consider leap years
 // returns the delta in minutes
 extern int wvutilsCalculatePackedTimeDelta
 (
-    USHORT      newDate,
-    USHORT      newTime,
-    USHORT      oldDate,
-    USHORT      oldTime
+    uint16_t      newDate,
+    uint16_t      newTime,
+    uint16_t      oldDate,
+    uint16_t      oldTime
 );
 
 // increment a packed time value by the given minutes, rolls over at 24:00
-extern USHORT wvutilsIncrementPackedTime (USHORT pTime, int minutes);
+extern uint16_t wvutilsIncrementPackedTime (uint16_t pTime, int minutes);
 
 
 // define sun rise and set types
@@ -316,12 +339,12 @@ extern void sunTimesGetSunRiseSet
     float       latitude,
     float       longitude,
     int         type,       // RS_TYPE_SUN, RS_TYPE_CIVIL, RS_TYPE_ASTRO, RS_TYPE_MIDDAY
-    short       *packedRise,
-    short       *packedSet
+    int16_t     *packedRise,
+    int16_t     *packedSet
 );
 
 // Get day length in packed format
-extern short sunTimesGetDayLength
+extern int16_t sunTimesGetDayLength
 (
     int         year,
     int         month,
@@ -357,7 +380,7 @@ extern int wvutilsTimeIsToday(time_t checkTime);
 
 //  Determine if it is day or night
 //  Returns TRUE or FALSE
-extern int wvutilsIsDayTime (short timeSunrise, short timeSunset);
+extern int wvutilsIsDayTime (int16_t timeSunrise, int16_t timeSunset);
 
 
 //  return a string indicating the moon phase:
@@ -398,7 +421,7 @@ extern int wvutilsDetectDSTChange(void);
 // Returns degree equivalent or -1 if ERROR:
 extern int wvutilsConvertWindStrToDegrees(const char* windStr);
 
+// Create the CWOP version string:
 extern char* wvutilsCreateCWOPVersion(char* wviewStr);
 
 #endif
-

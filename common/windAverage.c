@@ -66,8 +66,8 @@ void windAverageAddBins (WAVG_ID id, int* bins)
 //  ... use consensus averaging to compute the average wind direction
 int windAverageCompute (WAVG_ID id)
 {
-    int         i, j, retVal;
-    int         sum, maxSum = 0, maxIndex = 0;
+    int         i, j, retVal, maxIndex = 0;
+    uint64_t    sum, maxSum = 0;
 
     //  ... first, fill in the "wrap-around" bins
     for (i = WAVG_NUM_BINS; i < WAVG_TOTAL_BINS; i ++)
@@ -105,8 +105,9 @@ int windAverageCompute (WAVG_ID id)
     }
     sum *= WAVG_INTERVAL;
     sum /= maxSum;
+    sum += (maxIndex * WAVG_INTERVAL);
 
-    retVal = (maxIndex * WAVG_INTERVAL) + sum;
+    retVal = (int)sum;
     retVal %= 720;
     retVal /= 2;
 

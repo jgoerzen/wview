@@ -98,10 +98,10 @@ __attribute__ ((packed)) WVIEW_MSG_REQUEST;
 typedef struct
 {
     time_t          lastArcTime;
-    short           archiveInterval;
-    short           latitude;
-    short           longitude;
-    short           elevation;
+    int16_t         archiveInterval;
+    int16_t         latitude;
+    int16_t         longitude;
+    int16_t         elevation;
     char            stationType[_MAX_PATH];
 
 }
@@ -155,9 +155,11 @@ typedef struct
     int             wspeed;
     int             hiwspeed;
     float           sampleRain;
-    int             rainHour;
-    int             rainDay;
+    float           rainHour;
+    float           rainDay;
     int             dewpoint;
+    float           UV;
+    float           radiation;
     int             rxPercent;
 
 }

@@ -115,12 +115,12 @@ static int computeDataChanges (WVIEWD_WORK *work)
             store->weekchangewind = 0;
 
         if (arcRecord.value[DATA_INDEX_windDir] >= 0)
-            store->weekchangewinddir = (short)((float)current->windDir - (float)arcRecord.value[DATA_INDEX_windDir]);
+            store->weekchangewinddir = (int16_t)((float)current->windDir - (float)arcRecord.value[DATA_INDEX_windDir]);
         else
             store->weekchangewinddir = 0;
 
         if (arcRecord.value[DATA_INDEX_outHumidity] > ARCHIVE_VALUE_NULL)
-            store->weekchangehumid = current->outHumidity - (USHORT)arcRecord.value[DATA_INDEX_outHumidity];
+            store->weekchangehumid = current->outHumidity - (uint16_t)arcRecord.value[DATA_INDEX_outHumidity];
         else
             store->weekchangehumid = 0;
 
@@ -162,12 +162,12 @@ static int computeDataChanges (WVIEWD_WORK *work)
             store->daychangewind = 0;
 
         if (arcRecord.value[DATA_INDEX_windDir] >= 0)
-            store->daychangewinddir = (short)((float)current->windDir - (float)arcRecord.value[DATA_INDEX_windDir]);
+            store->daychangewinddir = (int16_t)((float)current->windDir - (float)arcRecord.value[DATA_INDEX_windDir]);
         else
             store->daychangewinddir = 0;
 
         if (arcRecord.value[DATA_INDEX_outHumidity] > ARCHIVE_VALUE_NULL)
-            store->daychangehumid = current->outHumidity - (USHORT)arcRecord.value[DATA_INDEX_outHumidity];
+            store->daychangehumid = current->outHumidity - (uint16_t)arcRecord.value[DATA_INDEX_outHumidity];
         else
             store->daychangehumid = 0;
 
@@ -209,12 +209,12 @@ static int computeDataChanges (WVIEWD_WORK *work)
             store->hourchangewind = 0;
 
         if (arcRecord.value[DATA_INDEX_windDir] >= 0)
-            store->hourchangewinddir = (short)((float)current->windDir - (float)arcRecord.value[DATA_INDEX_windDir]);
+            store->hourchangewinddir = (int16_t)((float)current->windDir - (float)arcRecord.value[DATA_INDEX_windDir]);
         else
             store->hourchangewinddir = 0;
 
         if (arcRecord.value[DATA_INDEX_outHumidity] > ARCHIVE_VALUE_NULL)
-            store->hourchangehumid = current->outHumidity - (USHORT)arcRecord.value[DATA_INDEX_outHumidity];
+            store->hourchangehumid = current->outHumidity - (uint16_t)arcRecord.value[DATA_INDEX_outHumidity];
         else
             store->hourchangehumid = 0;
 
@@ -757,7 +757,7 @@ static void intervalHousekeepingInit (WVIEWD_WORK *work)
     windAvg = sensorGetAvg (&work->sensors.sensor[STF_HOUR][SENSOR_WSPEED]);
     tempAvg = sensorGetAvg (&work->sensors.sensor[STF_HOUR][SENSOR_OUTTEMP]);
     work->loopPkt.intervalAvgWCHILL = wvutilsCalculateWindChill(tempAvg, windAvg);
-    work->loopPkt.intervalAvgWSPEED = (USHORT)windAvg;
+    work->loopPkt.intervalAvgWSPEED = (uint16_t)windAvg;
 
 
     return;
@@ -773,7 +773,7 @@ static void intervalHousekeeping (WVIEWD_WORK *work)
     windAvg = sensorGetAvg (&work->sensors.sensor[STF_INTERVAL][SENSOR_WSPEED]);
     tempAvg = sensorGetAvg (&work->sensors.sensor[STF_INTERVAL][SENSOR_OUTTEMP]);
     work->loopPkt.intervalAvgWCHILL = wvutilsCalculateWindChill(tempAvg, windAvg);
-    work->loopPkt.intervalAvgWSPEED = (USHORT)windAvg;
+    work->loopPkt.intervalAvgWSPEED = (uint16_t)windAvg;
 
 
     return;
@@ -893,7 +893,7 @@ ARCHIVE_PKT *computedDataGenerateArchive (WVIEWD_WORK *work)
     // create the time_t time for the record:
     localtime_r (&nowtime, &bknTime);
     bknTime.tm_sec  = 0;
-    ArcRecStore.dateTime = mktime(&bknTime);
+    ArcRecStore.dateTime = (int32_t)mktime(&bknTime);
 
     ArcRecStore.usUnits  = 1;
     ArcRecStore.interval = work->archiveInterval;
@@ -936,6 +936,10 @@ ARCHIVE_PKT *computedDataGenerateArchive (WVIEWD_WORK *work)
     {
         ArcRecStore.value[DATA_INDEX_windGust]   = 0;
     }
+
+    // save the high wind speed in the loop packet
+    work->loopPkt.windGust = (uint16_t)ArcRecStore.value[DATA_INDEX_windGust];
+
     ArcRecStore.value[DATA_INDEX_dewpoint]       =
         wvutilsCalculateDewpoint ((float)ArcRecStore.value[DATA_INDEX_outTemp],
                                   (float)ArcRecStore.value[DATA_INDEX_outHumidity]);

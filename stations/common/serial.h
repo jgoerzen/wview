@@ -49,6 +49,7 @@ typedef struct
 {
     void        (*portInit) (int fd);
     int         openFlags;
+    char        device[WVIEW_STRING2_SIZE];
 } MEDIUM_SERIAL;
 
 

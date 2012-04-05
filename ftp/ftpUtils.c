@@ -377,7 +377,7 @@ int ftpUtilsInit (FTP_DATA* data)
     {
         radMsgLog (PRI_HIGH, "FTP-ERROR: failed to initialize curl!");
         statusUpdateMessage("failed to initialize curl");
-        return;
+        return ERROR;
     }
 
     // Setup curl options that are not file specific:

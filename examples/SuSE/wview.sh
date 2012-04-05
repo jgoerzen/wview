@@ -60,6 +60,16 @@ PMOND_PID=$RUN_DIRECTORY/wvpmond.pid
 #
 return=$rc_done
 
+wait_for_time_set() {
+    THOUSAND=1000
+    CURRVAL=`date +%s`
+    while [ "$CURRVAL" -lt "$THOUSAND" ]; do
+        sleep 1
+        CURRVAL=`date +%s`
+    done
+}
+
+
 #
 # main part
 #
@@ -111,6 +121,8 @@ case "$1" in
 		kill -15 `cat $PMOND_PID`
 		rm -f $PMOND_PID
 	fi
+
+	wait_for_time_set
 
 	/sbin/startproc -v -t 1 $RADROUTER_BIN 1 $RUN_DIRECTORY
 	ret=$?

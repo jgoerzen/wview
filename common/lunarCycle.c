@@ -407,9 +407,9 @@ int GetMoonRiseSetTimes
     double       zone,                   // Timezone offset from UTC/GMT in hours
     double       lat,                    // Latitude degress  N=> +, S=> -
     double       lon,                    // longitude degress E=> +, W=> -
-    short        *packedRise,            // returned Moon Rise time
+    int16_t      *packedRise,            // returned Moon Rise time
     double       *riseAz,                // return Moon Rise Azimuth
-    short        *packedSet,             // returned Moon Set time
+    int16_t      *packedSet,             // returned Moon Set time
     double       *setAz                  // return Moon Set Azimuth
 )
 {
@@ -464,11 +464,11 @@ int GetMoonRiseSetTimes
         VHz[0] = VHz[2];
     }
 
-    *packedRise = (short)(MoonRise.hr * 100 +  MoonRise.min);
+    *packedRise = (int16_t)(MoonRise.hr * 100 +  MoonRise.min);
     if (riseAz != NULL)
         *riseAz = MoonRise.az;
 
-    *packedSet = (short)(MoonSet.hr * 100 +  MoonSet.min);
+    *packedSet = (int16_t)(MoonSet.hr * 100 +  MoonSet.min);
     if (setAz != NULL)
         *setAz = MoonSet.az;
 

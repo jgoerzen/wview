@@ -87,6 +87,10 @@
         SqliteDBSetValue($dbID, 'STATION_WLIP', 'yes');
     else
         SqliteDBSetValue($dbID, 'STATION_WLIP', 'no');
+    if ($_POST['field_Station_Retrieve_Archive'][0] == "yes")
+        SqliteDBSetValue($dbID, 'STATION_RETRIEVE_ARCHIVE', 'yes');
+    else
+        SqliteDBSetValue($dbID, 'STATION_RETRIEVE_ARCHIVE', 'no');
     if ($_POST['field_Station_Do_DTR'][0] == "yes")
         SqliteDBSetValue($dbID, 'STATION_DTR', 'yes');
     else

@@ -18,6 +18,11 @@ WVIEW_INSTALL_DIR=/usr/bin
 # pidfiles:          $prefix/var/wview/*.pid
 ################################################################################
 
+if [ -f $CONF_DIRECTORY/wview-user ]; then
+  WVIEW_USER=`cat $CONF_DIRECTORY/wview-user`
+fi
+: ${WVIEW_USER:=root}
+
 WVIEWD_FILE=`cat $CONF_DIRECTORY/wview-binary`
 WVIEWD_BIN=$WVIEW_INSTALL_DIR/$WVIEWD_FILE
 test -x $WVIEWD_BIN || exit 5
@@ -54,85 +59,56 @@ CWOPD_PID=$RUN_DIRECTORY/wvcwopd.pid
 HTTP_PID=$RUN_DIRECTORY/wvhttpd.pid
 PMOND_PID=$RUN_DIRECTORY/wvpmond.pid
 
-kill_running_processes() {
-	if [ -f $RADROUTER_PID ]; then
-		echo "radlib router pid file $RADROUTER_PID exists - killing existing process"
-		kill -15 `cat $RADROUTER_PID`
-		rm -f $RADROUTER_PID
-	fi
-	if [ -f $WVIEWD_PID ]; then
-		echo "wviewd pid file $WVIEWD_PID exists - killing existing process"
-		kill -15 `cat $WVIEWD_PID`
-		rm -f $WVIEWD_PID
-	fi
-	if [ -f $HTMLD_PID ]; then
-		echo "htmlgend pid file $HTMLD_PID exists - killing existing process"
-		kill -15 `cat $HTMLD_PID`
-		rm -f $HTMLD_PID
-	fi
-	if [ -f $FTPD_PID ]; then
-		echo "wviewftpd pid file $FTPD_PID exists - killing existing process"
-		kill -15 `cat $FTPD_PID`
-		rm -f $FTPD_PID
-	fi
-	if [ -f $SSHD_PID ]; then
-		echo "wviewsshd pid file $SSHD_PID exists - killing existing process"
-		kill -15 `cat $SSHD_PID`
-		rm -f $SSHD_PID
-	fi
-	if [ -f $ALARMD_PID ]; then
-		echo "wvalarmd pid file $ALARMD_PID exists - killing existing process"
-		kill -15 `cat $ALARMD_PID`
-		rm -f $ALARMD_PID
-	fi
-	if [ -f $CWOPD_PID ]; then
-		echo "wvcwopd pid file $CWOPD_PID exists - killing existing process"
-		kill -15 `cat $CWOPD_PID`
-		rm -f $CWOPD_PID
-	fi
-	if [ -f $HTTP_PID ]; then
-		echo "wvhttpd pid file $HTTP_PID exists - killing existing process"
-		kill -15 `cat $HTTP_PID`
-		rm -f $HTTP_PID
-	fi
-	if [ -f $PMOND_PID ]; then
-		echo "wvpmond pid file $PMOND_PID exists - killing existing process"
-		kill -15 `cat $PMOND_PID`
-		rm -f $PMOND_PID
-	fi
+wait_for_time_set() {
+    THOUSAND=1000
+    CURRVAL=`date +%s`
+    while [ "$CURRVAL" -lt "$THOUSAND" ]; do
+        sleep 1
+        CURRVAL=`date +%s`
+    done
 }
 
 case "$1" in
   start)
-	kill_running_processes
+	wait_for_time_set
 
 	echo "Starting wview daemons:"
 
 	if [ -x $RADROUTER_BIN ]; then
-	    $RADROUTER_BIN 1 $RUN_DIRECTORY
+		start-stop-daemon --start --oknodo --pidfile $RADROUTER_PID \
+			--chuid $WVIEW_USER --exec $RADROUTER_BIN 1 $RUN_DIRECTORY
+
 	else
 	    echo "Cannot find $RADROUTER_BIN - exiting!"
 	    exit 10
 	fi
 	sleep 1
-	$WVIEWD_BIN
+	start-stop-daemon --start --oknodo --pidfile $WVIEWD_PID \
+		--exec $WVIEWD_BIN --chuid $WVIEW_USER
 	sleep 1
-	$HTMLD_BIN
-	$ALARMD_BIN
-	$CWOPD_BIN
-	$HTTP_BIN
-	$FTPD_BIN
-	$SSHD_BIN
-    $PMOND_BIN
+	start-stop-daemon --start --oknodo --pidfile $HTMLD_PID \
+		--exec $HTMLD_BIN --chuid $WVIEW_USER
+	start-stop-daemon --start --oknodo --pidfile $ALARMD_PID \
+		--exec $ALARMD_BIN --chuid $WVIEW_USER
+	start-stop-daemon --start --oknodo --pidfile $CWOPD_PID \
+		--exec $CWOPD_BIN --chuid $WVIEW_USER
+	start-stop-daemon --start --oknodo --pidfile $HTTP_PID \
+		--exec $HTTP_BIN --chuid $WVIEW_USER
+	start-stop-daemon --start --oknodo --pidfile $FTPD_PID \
+		--exec $FTPD_BIN --chuid $WVIEW_USER
+	start-stop-daemon --start --oknodo --pidfile $SSHD_PID \
+		--exec $SSHD_BIN --chuid $WVIEW_USER
+	start-stop-daemon --start --oknodo --pidfile $PMOND_PID \
+		--exec $PMOND_BIN --chuid $WVIEW_USER
     ;;
   start-trace)
-	kill_running_processes
-
 	echo "Starting wview daemons (tracing to $RUN_DIRECTORY):"
 	echo "Warning: traced processes run very slowly and may effect performance."
 
 	if [ -x $RADROUTER_BIN ]; then
-	    $RADROUTER_BIN 1 $RUN_DIRECTORY
+		start-stop-daemon --start --oknodo --pidfile $RADROUTER_PID \
+			--chuid $WVIEW_USER --exec $RADROUTER_BIN 1 $RUN_DIRECTORY
+
 	else
 	    echo "Cannot find $RADROUTER_BIN - exiting!"
 	    exit 10
@@ -149,35 +125,24 @@ case "$1" in
 	strace -o $RUN_DIRECTORY/wvpmond.trace $PMOND_BIN -f &> /dev/null &
 	;;
   stop)
-	echo "Shutting down wview daemons..."
-	if [ -f $PMOND_PID ]; then
-	    kill -15 `cat $PMOND_PID`
-	fi
-	if [ -f $HTTP_PID ]; then
-	    kill -15 `cat $HTTP_PID`
-	fi
-	if [ -f $CWOPD_PID ]; then
-	    kill -15 `cat $CWOPD_PID`
-	fi
-	if [ -f $ALARMD_PID ]; then
-	    kill -15 `cat $ALARMD_PID`
-	fi
-	if [ -f $SSHD_PID ]; then
-	    kill -15 `cat $SSHD_PID`
-	fi
-	if [ -f $FTPD_PID ]; then
-	    kill -15 `cat $FTPD_PID`
-	fi
-	if [ -f $HTMLD_PID ]; then
-	    kill -15 `cat $HTMLD_PID`
-	fi
-	if [ -f $WVIEWD_PID ]; then
-	    kill -15 `cat $WVIEWD_PID`
-	fi
-	sleep 1
-	if [ -f $RADROUTER_PID ]; then
-	    kill -15 `cat $RADROUTER_PID`
-	fi
+	start-stop-daemon --stop --oknodo --pidfile $PMOND_PID \
+		--exec $PMOND_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $HTTP_PID \
+		--exec $HTTP_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $CWOPD_PID \
+		--exec $CWOPD_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $ALARMD_PID \
+		--exec $ALARMD_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $SSHD_PID \
+		--exec $SSHD_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $FTPD_PID \
+		--exec $FTPD_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $HTMLD_PID \
+		--exec $HTMLD_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $WVIEWD_PID \
+		--exec $WVIEWD_BIN --signal 15 --retry 5
+	start-stop-daemon --stop --oknodo --pidfile $RADROUTER_PID \
+		--exec $RADROUTER_BIN --signal 15 --retry 5
     ;;
   restart)
 	$0 stop  && sleep 2

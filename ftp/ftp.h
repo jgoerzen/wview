@@ -67,7 +67,7 @@ typedef struct
     char            daemonQname[128];
     char            wviewdir[128];
     TIMER_ID        timer;
-    ULONGLONG       msOffset;
+    uint64_t        msOffset;
     FTP_DATA        ftpData;
     FTP_ID          ftpId;
     int             exiting;

@@ -246,7 +246,7 @@
     <td width="300" valign="center" bgcolor="#FFFFFF"></td>
     <td width="380" valign="center" bgcolor="#FFFFFF"></td>
     <td width="10" valign="center" bgcolor="#FFFFFF"></td>
-    <td width="130" rowspan="11" valign="top" bgcolor="#6666CC" align="center"> 
+    <td width="130" rowspan="12" valign="top" bgcolor="#6666CC" align="center"> 
       <br>
       <br>
       <div align="center">
@@ -374,6 +374,32 @@
     <td valign="center" bgcolor="#FFFFFF">
       <input class=mainForm type=checkbox name=field_Generate_Metric_MM[] id=field_Generate_Metric_MM_option_1 value="yes" 
         <?php if ($field_Generate_Metric_MM == "yes") echo "checked"; ?>>
+    </td>
+    <td></td>
+  </tr>
+
+  <!-- Radio Buttons: -->
+  <tr> 
+    <td height="30" align="right" valign="center" bgcolor="#E7E7E7"></td>
+    <td valign="center" bgcolor="#E7E7E7"></td>
+    <td valign="center" bgcolor="#FFFFFF"></td>
+
+    <td valign="center" bgcolor="#FFFFFF"> 
+      <label class="formFieldQuestion">Default Wind Units:&nbsp;</label>
+    </td>
+    <td valign="center" bgcolor="#FFFFFF">
+      <input class=mainForm type=radio name=field_Generate_WindUnits id=field_Generate_WindUnits_option_1 
+        value="mph" <?php if ($field_Generate_WindUnits == "mph") echo "checked"; ?>
+        <label class=formFieldOption for="field_Generate_WindUnits_option_1">mph</label>&nbsp;&nbsp;&nbsp;
+      <input class=mainForm type=radio name=field_Generate_WindUnits id=field_Generate_WindUnits_option_2
+        value="m/s" <?php if ($field_Generate_WindUnits == "m/s") echo "checked"; ?>
+        <label class=formFieldOption for="field_Generate_WindUnits_option_2">m/s</label>&nbsp;&nbsp;&nbsp;
+      <input class=mainForm type=radio name=field_Generate_WindUnits id=field_Generate_WindUnits_option_3 
+        value="knots" <?php if ($field_Generate_WindUnits == "knots") echo "checked"; ?>
+        <label class=formFieldOption for="field_Generate_WindUnits_option_3">knots</label>&nbsp;&nbsp;&nbsp;
+      <input class=mainForm type=radio name=field_Generate_WindUnits id=field_Generate_WindUnits_option_4 
+        value="km/h" <?php if ($field_Generate_WindUnits == "km/h") echo "checked"; ?>
+        <label class=formFieldOption for="field_Generate_WindUnits_option_4">km/h</label>&nbsp;
     </td>
     <td></td>
   </tr>

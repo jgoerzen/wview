@@ -146,7 +146,7 @@ static int ReadDataFrame(WVIEWD_WORK *work)
 int virtualProtocolInit (WVIEWD_WORK *work)
 {
     time_t          nowtime = time(NULL);
-    ULONG           dateTime;
+    uint32_t        dateTime;
     int             retVal, retries = 0;
 
     memset (&virtualWork, 0, sizeof(virtualWork));

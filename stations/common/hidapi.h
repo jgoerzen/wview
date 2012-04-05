@@ -58,9 +58,9 @@ extern "C" {
 			/** Platform-specific device path */
 			char *path;
 			/** Device Vendor ID */
-			unsigned short vendor_id;
+			uint16_t vendor_id;
 			/** Device Product ID */
-			unsigned short product_id;
+			uint16_t product_id;
 			/** Serial Number */
 			wchar_t *serial_number;
 			/** Manufacturer String */
@@ -89,7 +89,7 @@ extern "C" {
 		    	attached to the system, or NULL in the case of failure. Free
 		    	this linked list by calling hid_free_enumeration().
 		*/
-		struct hid_device_info HID_API_EXPORT * HID_API_CALL hid_enumerate(unsigned short vendor_id, unsigned short product_id);
+		struct hid_device_info HID_API_EXPORT * HID_API_CALL hid_enumerate(uint16_t vendor_id, uint16_t product_id);
 		
 		/** Free an enumeration Linked List
 		    This function frees a linked list created by hid_enumerate().
@@ -116,7 +116,7 @@ extern "C" {
 				This function returns a pointer to a hid_device object on
 				success or NULL on failure.
 		*/
-		HID_API_EXPORT hid_device * HID_API_CALL hid_open(unsigned short vendor_id, unsigned short product_id);
+		HID_API_EXPORT hid_device * HID_API_CALL hid_open(uint16_t vendor_id, uint16_t product_id);
 
 		/** Open a HID device by its path name. The path name be determined
 		    by calling hid_enumerate(), or a platform-specific path name can

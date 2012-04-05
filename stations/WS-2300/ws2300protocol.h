@@ -100,10 +100,10 @@ typedef struct
 typedef struct
 {
     WS2300_DATA     sensorData;
-    USHORT          sensorStatus;
+    uint16_t        sensorStatus;
     WSSensorTypes   currentSensor;
-    UCHAR           commandData[WS2300_BUFFER_LENGTH];
-    UCHAR           readData[WS2300_BUFFER_LENGTH];
+    uint8_t         commandData[WS2300_BUFFER_LENGTH];
+    uint8_t         readData[WS2300_BUFFER_LENGTH];
     float           lastAttempt;
     int             numTries;
     int             numGood;

@@ -206,15 +206,15 @@ int stationGetPosition (WVIEWD_WORK *work)
 {
     // just set the values from our internal store - we retrieved them in
     // stationInit
-    work->elevation     = (short)simWorkData.elevation;
+    work->elevation     = (int16_t)simWorkData.elevation;
     if (simWorkData.latitude >= 0)
-        work->latitude      = (short)((simWorkData.latitude*10)+0.5);
+        work->latitude      = (int16_t)((simWorkData.latitude*10)+0.5);
     else
-        work->latitude      = (short)((simWorkData.latitude*10)-0.5);
+        work->latitude      = (int16_t)((simWorkData.latitude*10)-0.5);
     if (simWorkData.longitude >= 0)
-        work->longitude     = (short)((simWorkData.longitude*10)+0.5);
+        work->longitude     = (int16_t)((simWorkData.longitude*10)+0.5);
     else
-        work->longitude     = (short)((simWorkData.longitude*10)-0.5);
+        work->longitude     = (int16_t)((simWorkData.longitude*10)-0.5);
     
     radMsgLog (PRI_STATUS, "station location: elevation: %d feet",
                work->elevation);
@@ -368,27 +368,27 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest)
     // vary HUMIDITY from 60 to 80
     tempfloat = 70.0;
     tempfloat -= sin((float)DataGenerator*RAD/PERIOD_FACTOR) * 10.0;
-    dest->outHumidity = (USHORT)tempfloat;
+    dest->outHumidity = (uint16_t)tempfloat;
 
     // vary WINDSPD from 5 to 15
     tempfloat = 10;
     tempfloat += sin((float)DataGenerator*RAD/PERIOD_FACTOR) * 5.0;
-    dest->windSpeed = (USHORT)tempfloat;
+    dest->windSpeed = (uint16_t)tempfloat;
 
     // vary WINDDIR from 0 to 90
     tempfloat = 0;
     tempfloat += fabsf(sin((float)DataGenerator*RAD/PERIOD_FACTOR)) * 90.0;
-    dest->windDir = (USHORT)tempfloat;
+    dest->windDir = (uint16_t)tempfloat;
 
     // vary MAXWIND from 15 to 25
     tempfloat = 20;
     tempfloat += sin((float)DataGenerator*RAD/PERIOD_FACTOR) * 5.0;
-    dest->windGust = (USHORT)tempfloat;
+    dest->windGust = (uint16_t)tempfloat;
 
     // vary MAXWINDDIR from 0 to 90
     tempfloat = 45;
     tempfloat += sin((float)DataGenerator*RAD/PERIOD_FACTOR) * 45.0;
-    dest->windGustDir = (USHORT)tempfloat;
+    dest->windGustDir = (uint16_t)tempfloat;
 
     // vary RAINRATE from 0.00 to 4.8
     tempfloat = 0;

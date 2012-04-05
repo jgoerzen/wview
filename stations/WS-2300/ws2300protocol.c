@@ -75,16 +75,16 @@ static WS_SENSOR_INFO       sensorInfo[WS_SENSOR_MAX] =
 };
 
 
-static void encodeAddress (int address_in, UCHAR* address_out)
+static void encodeAddress (int address_in, uint8_t* address_out)
 {
     int             i = 0;
     int             adrbytes = 4;
-    UCHAR           nibble;
+    uint8_t         nibble;
 
     for (i = 0; i < adrbytes; i ++)
     {
         nibble = (address_in >> (4 * (3 - i))) & 0x0F;
-        address_out[i] = (UCHAR) (0x82 + (nibble * 4));
+        address_out[i] = (uint8_t) (0x82 + (nibble * 4));
     }
 
     return;
@@ -93,26 +93,26 @@ static void encodeAddress (int address_in, UCHAR* address_out)
 static void encodeData
 (
     int             number, 
-    UCHAR           encode_constant,
-    UCHAR*          data_in, 
-    UCHAR*          data_out
+    uint8_t         encode_constant,
+    uint8_t*        data_in, 
+    uint8_t*        data_out
 )
 {
     int             i = 0;
 
     for (i = 0; i < number; i ++)
     {
-        data_out[i] = (UCHAR) (encode_constant + (data_in[i] * 4));
+        data_out[i] = (uint8_t) (encode_constant + (data_in[i] * 4));
     }
 
     return;
 }
 
-static UCHAR encodeLength (int number)
+static uint8_t encodeLength (int number)
 {
     int             coded_number;
 
-    coded_number = (UCHAR) (0xC2 + number * 4);
+    coded_number = (uint8_t) (0xC2 + number * 4);
     if (coded_number > 0xfe)
         coded_number = 0xfe;
 
@@ -123,19 +123,19 @@ static UCHAR encodeLength (int number)
  * checksumSequence calculates the checksum for the first 4
  * commands sent to WS2300.
  ******************************************************************************/
-static UCHAR checksumSequence (UCHAR* command, int sequence)
+static uint8_t checksumSequence (uint8_t* command, int sequence)
 {
     int             response;
 
     response = sequence * 16 + ((*command) - 0x82) / 4;
-    return (UCHAR) response;
+    return (uint8_t)response;
 }
 
 /*******************************************************************************
  * checksumLast calculates the checksum for the last command
  * which is sent just before data is received from WS2300
  ******************************************************************************/
-static UCHAR checksumLast (int number)
+static uint8_t checksumLast (int number)
 {
     int             response;
 
@@ -148,7 +148,7 @@ static UCHAR checksumLast (int number)
  * checksumDataRX calculates the checksum for the data bytes received
  * from the WS2300
  ******************************************************************************/
-static UCHAR checksumDataRX (UCHAR* data, int number)
+static uint8_t checksumDataRX (uint8_t* data, int number)
 {
     int             checksum = 0;
     int             i;
@@ -159,7 +159,7 @@ static UCHAR checksumDataRX (UCHAR* data, int number)
     }
 
     checksum &= 0xFF;
-    return (UCHAR) checksum;
+    return (uint8_t) checksum;
 }
 
 /*******************************************************************************
@@ -167,8 +167,8 @@ static UCHAR checksumDataRX (UCHAR* data, int number)
  ******************************************************************************/
 static void resetStation (WVIEWD_WORK* work)
 {
-    UCHAR       command = 0x06;
-    UCHAR       answer;
+    uint8_t     command = 0x06;
+    uint8_t     answer;
     int         i;
 
     for (i = 0; i < 3; i ++)
@@ -289,35 +289,35 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WS2300_DATA *src)
     {
         tempfloat = src->outHumidity;
         tempfloat += 0.5;
-        dest->outHumidity                   = (USHORT)tempfloat;
+        dest->outHumidity                   = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windSpeed && src->windSpeed <= 250)
     {
         tempfloat = src->windSpeed;
         tempfloat += 0.5;
-        dest->windSpeed                     = (USHORT)tempfloat;
+        dest->windSpeed                     = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windDir && src->windDir <= 360)
     {
         tempfloat = src->windDir;
         tempfloat += 0.5;
-        dest->windDir                       = (USHORT)tempfloat;
+        dest->windDir                       = (uint16_t)tempfloat;
     }
 
     if (0 <= src->maxWindSpeed && src->maxWindSpeed <= 250)
     {
         tempfloat = src->maxWindSpeed;
         tempfloat += 0.5;
-        dest->windGust                      = (USHORT)tempfloat;
+        dest->windGust                      = (uint16_t)tempfloat;
     }
 
     if (0 <= src->maxWindDir && src->maxWindDir <= 360)
     {
         tempfloat = src->maxWindDir;
         tempfloat += 0.5;
-        dest->windGustDir                   = (USHORT)tempfloat;
+        dest->windGustDir                   = (uint16_t)tempfloat;
     }
 
     if (0 <= src->rain)
@@ -367,7 +367,7 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WS2300_DATA *src)
     dest->inTemp                        = src->inTemp;
     tempfloat = src->inHumidity;
     tempfloat += 0.5;
-    dest->inHumidity                    = (USHORT)tempfloat;
+    dest->inHumidity                    = (uint16_t)tempfloat;
 
     return;
 }
@@ -503,7 +503,7 @@ int wsAdrs0State (int state, void *stimulus, void *data)
     STIM                *stim = (STIM *)stimulus;
     WVIEWD_WORK         *work = (WVIEWD_WORK *)data;
     int                 retVal;
-    UCHAR               readData;
+    uint8_t             readData;
 
     switch (stim->type)
     {
@@ -551,7 +551,7 @@ int wsAdrs1State (int state, void *stimulus, void *data)
     STIM                *stim = (STIM *)stimulus;
     WVIEWD_WORK         *work = (WVIEWD_WORK *)data;
     int                 retVal;
-    UCHAR               readData;
+    uint8_t             readData;
 
     switch (stim->type)
     {
@@ -599,7 +599,7 @@ int wsAdrs2State (int state, void *stimulus, void *data)
     STIM                *stim = (STIM *)stimulus;
     WVIEWD_WORK         *work = (WVIEWD_WORK *)data;
     int                 retVal;
-    UCHAR               readData;
+    uint8_t             readData;
 
     switch (stim->type)
     {
@@ -647,7 +647,7 @@ int wsAdrs3State (int state, void *stimulus, void *data)
     STIM                *stim = (STIM *)stimulus;
     WVIEWD_WORK         *work = (WVIEWD_WORK *)data;
     int                 retVal;
-    UCHAR               readData;
+    uint8_t             readData;
 
     switch (stim->type)
     {
@@ -695,7 +695,7 @@ int wsNumBytesState (int state, void *stimulus, void *data)
     STIM                *stim = (STIM *)stimulus;
     WVIEWD_WORK         *work = (WVIEWD_WORK *)data;
     int                 retVal;
-    UCHAR               readData;
+    uint8_t             readData;
     WS2300_IF_DATA*     ifWorkData = (WS2300_IF_DATA*)work->stationData;
     float               tempFloat = 0;
     int                 IsGoodValue;

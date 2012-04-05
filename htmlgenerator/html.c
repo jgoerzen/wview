@@ -283,7 +283,7 @@ static void timerHandler (void *parm)
 {
     STIM            stim;
     struct timeval  timenow;
-    ULONG           netOffset;
+    uint32_t        netOffset;
 
     // get current time
     gettimeofday(&timenow, NULL);
@@ -670,6 +670,50 @@ int main (int argc, char *argv[])
     {
         // just assume single units
         htmlWork.isDualUnits = 0;
+    }
+
+    // Get the default wind units:
+    sValue = wvconfigGetStringValue(configItem_HTMLGEN_WIND_UNITS);
+    if (sValue == NULL)
+    {
+        radMsgLog (PRI_MEDIUM, "HTMLGEN_WIND_UNITS not found, defaulting to MPH...");
+        htmlWork.windUnits = HTML_WINDUNITS_MPH;
+        wvutilsSetWindUnits(HTML_WINDUNITS_MPH);
+    }
+    else if (!strncmp(sValue, "mph", 3))
+    {
+        // mph
+        htmlWork.windUnits = HTML_WINDUNITS_MPH;
+        wvutilsSetWindUnits(HTML_WINDUNITS_MPH);
+        radMsgLog (PRI_STATUS, "Using mph as default wind units");
+    }
+    else if (!strncmp(sValue, "m/s", 3))
+    {
+        // m/s
+        htmlWork.windUnits = HTML_WINDUNITS_MS;
+        wvutilsSetWindUnits(HTML_WINDUNITS_MS);
+        radMsgLog (PRI_STATUS, "Using m/s as default wind units");
+    }
+    else if (!strncmp(sValue, "knots", 5))
+    {
+        // knots
+        htmlWork.windUnits = HTML_WINDUNITS_KNOTS;
+        wvutilsSetWindUnits(HTML_WINDUNITS_KNOTS);
+        radMsgLog (PRI_STATUS, "Using knots as default wind units");
+    }
+    else if (!strncmp(sValue, "km/h", 4))
+    {
+        // km/h
+        htmlWork.windUnits = HTML_WINDUNITS_KMH;
+        wvutilsSetWindUnits(HTML_WINDUNITS_KMH);
+        radMsgLog (PRI_STATUS, "Using km/h as default wind units");
+    }
+    else
+    {
+        // default to mph:
+        htmlWork.windUnits = HTML_WINDUNITS_MPH;
+        wvutilsSetWindUnits(HTML_WINDUNITS_MPH);
+        radMsgLog (PRI_STATUS, "DB value not recognized: using mph as default wind units");
     }
 
     wvconfigExit ();

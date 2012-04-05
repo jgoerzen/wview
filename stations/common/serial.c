@@ -105,6 +105,9 @@ static int serialInit (WVIEW_MEDIUM *med, char *deviceName)
     tcflush (med->fd, TCIFLUSH);
     tcflush (med->fd, TCOFLUSH);
 
+    // Save the device name:
+    strncpy(serialWork->device, deviceName, WVIEW_STRING2_SIZE);
+
     radUtilsSleep (1);
     return OK;
 }
@@ -115,6 +118,26 @@ static void serialExit (WVIEW_MEDIUM *med)
     tcflush (med->fd, TCOFLUSH);
     close (med->fd);
     return;
+}
+
+static int serialRestart (WVIEW_MEDIUM *med)
+{
+    MEDIUM_SERIAL   *work = (MEDIUM_SERIAL*)med->workData;
+
+    serialExit(med);
+    radMsgLog (PRI_HIGH, "serialRestart: attempting restart");
+    while ((!wviewdIsExiting()) && (serialInit(med, work->device) == ERROR))
+    {
+        radMsgLog (PRI_HIGH, "serialRestart: restart failed");
+        radUtilsSleep(5000);
+        radMsgLog (PRI_HIGH, "serialRestart: retrying restart");
+    }
+    if (!wviewdIsExiting())
+    {
+        radMsgLog (PRI_HIGH, "serialRestart: recovered");
+    }
+    return OK;
+
 }
 
 static int serialWrite (WVIEW_MEDIUM *med, void *buffer, int length)
@@ -142,8 +165,8 @@ static int serialWrite (WVIEW_MEDIUM *med, void *buffer, int length)
 static int serialReadExact (WVIEW_MEDIUM *med, void *bfr, int len, int msTimeout)
 {
     int         rval, cumTime = 0, index = 0;
-    ULONGLONG   readTime;
-    UCHAR       *ptr = (UCHAR *)bfr;
+    uint64_t    readTime;
+    uint8_t     *ptr = (uint8_t *)bfr;
 
     while (index < len && cumTime < msTimeout)
     {
@@ -220,6 +243,7 @@ int serialMediumInit (WVIEW_MEDIUM *medium, void (*portInit)(int fd), int openFl
 
     medium->init        = serialInit;
     medium->exit        = serialExit;
+    medium->restart     = serialRestart;
     medium->read        = serialReadExact;
     medium->write       = serialWrite;
     medium->flush       = serialFlush;

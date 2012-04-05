@@ -52,6 +52,7 @@
      objWmr = document.getElementById('wmrchan').style;
      objWmr = document.getElementById('rxcheck').style;
      objwlinkip = document.getElementById('wlinkip').style;
+     objwlinkarchive = document.getElementById('wlinkarchive').style;
      objdevice = document.getElementById('devicename').style;
      objhost = document.getElementById('hostname').style;
      objport = document.getElementById('portnumber').style;
@@ -69,6 +70,7 @@
            show('devicename');
            hide('hostname');
            hide('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            hide('comm_header_medium');
            show('comm_header_small');
@@ -79,6 +81,7 @@
            hide('devicename');
            show('hostname');
            show('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            show('comm_header_medium');
            hide('comm_header_small');
@@ -89,6 +92,7 @@
            show('devicename');
            hide('hostname');
            hide('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            hide('comm_header_medium');
            show('comm_header_small');
@@ -110,6 +114,7 @@
         hide('devicename');
         hide('hostname');
         hide('portnumber');
+        hide('comm_header_giant');
         hide('comm_header_big');
         hide('comm_header_medium');
         hide('comm_header_small');
@@ -118,19 +123,25 @@
      else if (station == 'Davis Vantage Pro')
      {
         show('wlinkip');
+        show('wlinkarchive');
         show('rxcheck');
         hide('wmrchan');
         hide('serialdtr');
         show('interface');
         show('misc_header_big');
         hide('misc_header_small');
+        hide('location_header_normal');
+        hide('elevation');
+        hide('latitude');
+        hide('longitude');
         if (isSerial)
         {
            show('devicename');
            hide('hostname');
            hide('portnumber');
-           hide('comm_header_big');
-           show('comm_header_medium');
+           hide('comm_header_giant');
+           show('comm_header_big');
+           hide('comm_header_medium');
            hide('comm_header_small');
            hide('comm_header_tiny');
         }
@@ -139,7 +150,8 @@
            hide('devicename');
            show('hostname');
            show('portnumber');
-           show('comm_header_big');
+           show('comm_header_giant');
+           hide('comm_header_big');
            hide('comm_header_medium');
            hide('comm_header_small');
            hide('comm_header_tiny');
@@ -149,8 +161,9 @@
            show('devicename');
            hide('hostname');
            hide('portnumber');
-           hide('comm_header_big');
-           show('comm_header_medium');
+           hide('comm_header_giant');
+           show('comm_header_big');
+           hide('comm_header_medium');
            hide('comm_header_small');
            hide('comm_header_tiny');
         }
@@ -169,6 +182,7 @@
            show('devicename');
            hide('hostname');
            hide('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            hide('comm_header_medium');
            show('comm_header_small');
@@ -179,6 +193,7 @@
            hide('devicename');
            show('hostname');
            show('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            show('comm_header_medium');
            hide('comm_header_small');
@@ -189,6 +204,7 @@
            show('devicename');
            hide('hostname');
            hide('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            hide('comm_header_medium');
            show('comm_header_small');
@@ -209,6 +225,7 @@
            show('devicename');
            hide('hostname');
            hide('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            hide('comm_header_medium');
            show('comm_header_small');
@@ -219,6 +236,7 @@
            hide('devicename');
            show('hostname');
            show('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            show('comm_header_medium');
            hide('comm_header_small');
@@ -229,6 +247,7 @@
            show('devicename');
            hide('hostname');
            hide('portnumber');
+           hide('comm_header_giant');
            hide('comm_header_big');
            hide('comm_header_medium');
            show('comm_header_small');
@@ -422,15 +441,12 @@
     </td>
   </tr>
   <tr id="comm_header_medium" style=<?php
-                if ((strcmp($field_Station_Type, "Davis Vantage Pro") &&
+                if (strcmp($field_Station_Type, "Davis Vantage Pro") &&
                      strcmp($field_Station_Type, "Simulator") &&
                      strcmp($field_Station_Type, "Oregon Scientific WMRUSB") &&
                      strcmp($field_Station_Type, "Fine Offset WH1080") &&
                      strcmp($field_Station_Type, "Honeywell TE923") &&
                      !strcmp($field_Station_Interface == "ethernet"))
-                    ||
-                    (!strcmp($field_Station_Type, "Davis Vantage Pro") && 
-                     !strcmp($field_Station_Interface, "serial")))
                     echo $EMPTY; 
                 else 
                     echo $NONE;
@@ -452,7 +468,7 @@
   </tr>
   <tr id="comm_header_big" style=<?php
                 if (!strcmp($field_Station_Type, "Davis Vantage Pro") && 
-                    !strcmp($field_Station_Interface, "ethernet"))
+                    !strcmp($field_Station_Interface, "serial"))
                     echo $EMPTY; 
                 else 
                     echo $NONE;
@@ -465,6 +481,28 @@
     <td width="180" valign="center" bgcolor="#FFFFFF"></td>
     <td width="10" valign="center" bgcolor="#FFFFFF"></td>
     <td width="130" rowspan="6" valign="top" bgcolor="#6666CC" align="center"> 
+      <br>
+      <br>
+      <div align="center"><font face="Arial" style="font-size: 8pt" color="#FFFFFF"> 
+        The weather station can be connected using a serial or ethernet interface.<br></font>
+      </div>
+    </td>
+  </tr>
+  <tr id="comm_header_giant" style=<?php
+                if (!strcmp($field_Station_Type, "Davis Vantage Pro") && 
+                    !strcmp($field_Station_Interface, "ethernet"))
+                    echo $EMPTY; 
+                else 
+                    echo $NONE;
+                ?>>
+    <td width="124" height="20" valign="center" align="right" bgcolor="#E7E7E7">
+      <font face="Arial" style="font-size: 10pt" color="#000000">Communication</font></td>
+    <td width="6" valign="center" bgcolor="#E7E7E7">&nbsp;</td>
+    <td width="10" valign="center" bgcolor="#FFFFFF"></td>
+    <td width="500" valign="center" bgcolor="#FFFFFF"></td>
+    <td width="180" valign="center" bgcolor="#FFFFFF"></td>
+    <td width="10" valign="center" bgcolor="#FFFFFF"></td>
+    <td width="130" rowspan="7" valign="top" bgcolor="#6666CC" align="center"> 
       <br>
       <br>
       <div align="center"><font face="Arial" style="font-size: 8pt" color="#FFFFFF"> 
@@ -534,6 +572,34 @@
     <td valign="center" bgcolor="#FFFFFF">
       <input class=mainForm type=checkbox name=field_Station_WLIP[] id=field_Station_WLIP_option_1 value="yes" 
         <?php if ($field_Station_WLIP == "yes") echo "checked"; ?>>
+    </td>
+    <td></td>
+  </tr>
+
+  <!-- Checkbox: -->
+  <tr id="wlinkarchive" style=<?php
+                if (!strcmp($field_Station_Type, "Davis Vantage Pro"))
+                    echo $EMPTY; 
+                else 
+                    echo $NONE;
+                ?>> 
+    <td height="30" align="right" valign="center" bgcolor="#E7E7E7"></td>
+    <td valign="center" bgcolor="#E7E7E7"></td>
+    <td valign="center" bgcolor="#FFFFFF"></td>
+    <td valign="center" bgcolor="#FFFFFF"> 
+    <label class="formFieldQuestion">Retrieve archive records from console (if not enabled, they will be autogenerated):
+        <a class=info href=#><img src=imgs/tip_small.png border=0>
+          <span class=infobox>
+            Only deselect this if you have a Vantage Pro station and don't want to use the console-generated archive records. 
+            This will also prevent retrieval of missed archive records in the datalogger if the wview server loses connection
+            with the VP console.
+          </span>
+        </a>
+      </label>
+    </td>
+    <td valign="center" bgcolor="#FFFFFF">
+      <input class=mainForm type=checkbox name=field_Station_Retrieve_Archive[] id=field_Station_Retrieve_Archive_option_1 value="yes" 
+        <?php if ($field_Station_Retrieve_Archive == "yes") echo "checked"; ?>>
     </td>
     <td></td>
   </tr>
@@ -795,7 +861,12 @@
   </tr>
 
   <!-- Section Heading: -->
-  <tr> 
+  <tr id="location_header_normal" style=<?php
+                if (!strcmp($field_Station_Type, "Davis Vantage Pro"))
+                    echo $NONE; 
+                else 
+                    echo $EMPTY;
+                ?>>
     <td width="124" height="20" valign="center" align="right" bgcolor="#E7E7E7">
       <font face="Arial" style="font-size: 10pt" color="#000000">Location</font></td>
     <td width="6" valign="center" bgcolor="#E7E7E7">&nbsp;</td>
@@ -813,7 +884,12 @@
   </tr>
 
   <!-- Text: -->
-  <tr> 
+  <tr id="elevation" style=<?php
+                if (!strcmp($field_Station_Type, "Davis Vantage Pro"))
+                    echo $NONE; 
+                else 
+                    echo $EMPTY;
+                ?>>
     <td height="30" align="right" valign="center" bgcolor="#E7E7E7"></td>
     <td valign="center" bgcolor="#E7E7E7"></td>
     <td valign="center" bgcolor="#FFFFFF"></td>
@@ -830,7 +906,12 @@
   </tr>
 
   <!-- Text: -->
-  <tr> 
+  <tr id="latitude" style=<?php
+                if (!strcmp($field_Station_Type, "Davis Vantage Pro"))
+                    echo $NONE; 
+                else 
+                    echo $EMPTY;
+                ?>>
     <td height="30" align="right" valign="center" bgcolor="#E7E7E7"></td>
     <td valign="center" bgcolor="#E7E7E7"></td>
     <td valign="center" bgcolor="#FFFFFF"></td>
@@ -847,7 +928,12 @@
   </tr>
 
   <!-- Text: -->
-  <tr> 
+  <tr id="longitude" style=<?php
+                if (!strcmp($field_Station_Type, "Davis Vantage Pro"))
+                    echo $NONE; 
+                else 
+                    echo $EMPTY;
+                ?>>
     <td height="30" align="right" valign="center" bgcolor="#E7E7E7"></td>
     <td valign="center" bgcolor="#E7E7E7"></td>
     <td valign="center" bgcolor="#FFFFFF"></td>

@@ -50,7 +50,7 @@
 
 #ifndef BUILD_UTILITIES
 #include <wvconfig.h>
-static USHORT   VerboseMask, DaemonMask;
+static uint16_t VerboseMask, DaemonMask;
 #endif
 
 static int      IsMetricRainMM = 1;
@@ -66,7 +66,7 @@ static int      IsMetricRainMM = 1;
 // ***************************************************************************
 // * Output Controlled General Event Logging
 // ***************************************************************************
-int wvutilsSetVerbosity (USHORT daemonBitMask)
+int wvutilsSetVerbosity (uint16_t daemonBitMask)
 {
     const char*     sValue;
     int             i;
@@ -320,6 +320,83 @@ float wvutilsConvertSPToAltimeter (float SPInches, float elevationFT)
 // ***************************************************************************
 // * Converters
 // ***************************************************************************
+
+// Configurable wind units:
+static HTML_WUNITS  WVU_WindUnits;
+void wvutilsSetWindUnits(HTML_WUNITS units)
+{
+    WVU_WindUnits = units;
+}
+
+char* wvutilsGetWindUnitLabel(void)
+{
+    static char     W_Units_Label[16];
+
+    switch (WVU_WindUnits)
+    {
+    case HTML_WINDUNITS_MPH:
+        strncpy(W_Units_Label, "mph", 3);
+        break;
+    case HTML_WINDUNITS_MS:
+        strncpy(W_Units_Label, "m/s", 3);
+        break;
+    case HTML_WINDUNITS_KNOTS:
+        strncpy(W_Units_Label, "knots", 5);
+        break;
+    case HTML_WINDUNITS_KMH:
+        strncpy(W_Units_Label, "km/h", 4);
+        break;
+    }
+
+    return W_Units_Label;
+}
+
+float wvutilsGetWindSpeed(float mph)
+{
+    float   RetVal = -1;
+
+    switch (WVU_WindUnits)
+    {
+    case HTML_WINDUNITS_MPH:
+        RetVal = mph;
+        break;
+    case HTML_WINDUNITS_MS:
+        RetVal = wvutilsConvertMPHToMPS(mph);
+        break;
+    case HTML_WINDUNITS_KNOTS:
+        RetVal = wvutilsConvertMPHToKnots(mph);
+        break;
+    case HTML_WINDUNITS_KMH:
+        RetVal = wvutilsConvertMPHToKPH(mph);
+        break;
+    }
+
+    return RetVal;
+}
+
+float wvutilsGetWindSpeedMetric(float kmh)
+{
+    float   RetVal = -1;
+
+    switch (WVU_WindUnits)
+    {
+    case HTML_WINDUNITS_MPH:
+        RetVal = wvutilsConvertKPHToMPH(kmh);
+        break;
+    case HTML_WINDUNITS_MS:
+        RetVal = wvutilsConvertKPHToMPS(kmh);
+        break;
+    case HTML_WINDUNITS_KNOTS:
+        RetVal = wvutilsConvertKPHToKnots(kmh);
+        break;
+    case HTML_WINDUNITS_KMH:
+        RetVal = kmh;
+        break;
+    }
+
+    return RetVal;
+}
+
 void wvutilsSetRainIsMM(int setValue)
 {
     IsMetricRainMM = setValue;
@@ -367,54 +444,6 @@ float wvutilsConvertDeltaFToC (float fahrenValue)
     
     retVal = fahrenValue * 5.0;
     retVal /= 9.0;
-    
-    return retVal;
-}
-
-float wvutilsConvertMPHToKPH (float mph)
-{
-    float      retVal;
-
-    if (mph <= ARCHIVE_VALUE_NULL) 
-        return ARCHIVE_VALUE_NULL;
-    
-    retVal = 1.609344 * mph;
-    
-    return retVal;
-}
-
-float wvutilsConvertKPHToMPH (float kph)
-{
-    float      retVal;
-
-    if (kph <= ARCHIVE_VALUE_NULL) 
-        return ARCHIVE_VALUE_NULL;
-    
-    retVal = kph / 1.609344;
-    
-    return retVal;
-}
-
-float wvutilsConvertMPHToMPS (float mph)
-{
-    float      retVal;
-    
-    if (mph <= ARCHIVE_VALUE_NULL) 
-        return ARCHIVE_VALUE_NULL;
-
-    retVal = 0.447027 * mph;
-    
-    return retVal;
-}
-
-float wvutilsConvertMPHToKnots (float mph)
-{
-    float      retVal;
-    
-    if (mph <= ARCHIVE_VALUE_NULL) 
-        return ARCHIVE_VALUE_NULL;
-    
-    retVal = 0.868952 * mph;
     
     return retVal;
 }
@@ -527,6 +556,77 @@ float wvutilsConvertMilesToKilometers (float miles)
     return retVal;
 }
 
+float wvutilsConvertMPHToKPH (float mph)
+{
+    float      retVal;
+
+    if (mph <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = 1.609344 * mph;
+
+    return retVal;
+}
+
+float wvutilsConvertKPHToMPH (float kph)
+{
+    float      retVal;
+
+    if (kph <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = kph / 1.609344;
+
+    return retVal;
+}
+
+float wvutilsConvertKPHToMPS (float kph)
+{
+    float      retVal;
+
+    if (kph <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = kph * 0.2777697;
+
+    return retVal;
+}
+
+float wvutilsConvertKPHToKnots (float kph)
+{
+    float      retVal;
+
+    if (kph <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = kph * 0.5399417;
+
+    return retVal;
+}
+float wvutilsConvertMPHToMPS (float mph)
+{
+    float      retVal;
+
+    if (mph <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = 0.447027 * mph;
+
+    return retVal;
+}
+
+float wvutilsConvertMPHToKnots (float mph)
+{
+    float      retVal;
+
+    if (mph <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = 0.8689762 * mph;
+
+    return retVal;
+}
+
 float wvutilsConvertMPSToKPH (float mps)
 {
     float      retVal;
@@ -551,6 +651,18 @@ float wvutilsConvertMPSToMPH (float mps)
     return retVal;
 }
 
+float wvutilsConvertMPSToKnots (float mps)
+{
+    float      retVal;
+
+    if (mps <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = mps * 1.943759;
+
+    return retVal;
+}
+
 float wvutilsConvertKnotsToKPH (float mps)
 {
     float      retVal;
@@ -563,15 +675,27 @@ float wvutilsConvertKnotsToKPH (float mps)
     return retVal;
 }
 
-float wvutilsConvertKnotsToMPH (float mps)
+float wvutilsConvertKnotsToMPS (float mps)
+{
+    float      retVal;
+
+    if (mps <= ARCHIVE_VALUE_NULL)
+        return ARCHIVE_VALUE_NULL;
+
+    retVal = mps * 0.388445;
+
+    return retVal;
+}
+
+float wvutilsConvertKnotsToMPH (float knots)
 {
     float      retVal;
     
-    if (mps <= ARCHIVE_VALUE_NULL) 
+    if (knots <= ARCHIVE_VALUE_NULL)
         return ARCHIVE_VALUE_NULL;
     
-    retVal = mps * 0.868952;
-    
+    retVal = knots * 1.150779;
+
     return retVal;
 }
 
@@ -602,7 +726,7 @@ float wvutilsConvertFeetToMeters (float feet)
 
 //  Determine if it is day or night
 //  Returns TRUE or FALSE
-int wvutilsIsDayTime (short sunrise, short sunset)
+int wvutilsIsDayTime (int16_t sunrise, int16_t sunset)
 {
     time_t          currTime;
     struct tm       locTime;
@@ -730,7 +854,7 @@ float wvutilsCalculateAirDensity (float tempF, float bp, float dp)
     return density;
 }
 
-time_t wvutilsPackedTimeToTimeT (USHORT packedDate, USHORT packedTime)
+time_t wvutilsPackedTimeToTimeT (uint16_t packedDate, uint16_t packedTime)
 {
     time_t      timeT;
     struct tm   locTime;
@@ -752,10 +876,10 @@ time_t wvutilsPackedTimeToTimeT (USHORT packedDate, USHORT packedTime)
 // returns the delta in minutes
 int wvutilsCalculatePackedTimeDelta
 (
-    USHORT      newDate,
-    USHORT      newTime,
-    USHORT      oldDate,
-    USHORT      oldTime
+    uint16_t    newDate,
+    uint16_t    newTime,
+    uint16_t    oldDate,
+    uint16_t    oldTime
 )
 {
     int         diffMinutes;
@@ -771,10 +895,10 @@ int wvutilsCalculatePackedTimeDelta
 }    
 
 // increment a packed time value by the given minutes, rolls over at 24:00
-USHORT wvutilsIncrementPackedTime (USHORT pTime, int minutes)
+uint16_t wvutilsIncrementPackedTime (uint16_t pTime, int minutes)
 {
     int         tempMin, tempHour;
-    USHORT      retVal;
+    uint16_t    retVal;
 
     tempMin = EXTRACT_PACKED_MINUTE(pTime) + minutes;
     tempHour = EXTRACT_PACKED_HOUR(pTime);
@@ -1017,7 +1141,7 @@ int wvutilsWriteMarkerFile(const char* filePath, time_t marker)
         return ERROR;
     }
 
-    fprintf (pFile, "%lu", (ULONG)marker);
+    fprintf (pFile, "%u", (uint32_t)marker);
     fclose (pFile);
     return OK;
 }
@@ -1026,7 +1150,7 @@ time_t wvutilsReadMarkerFile(const char* filePath)
 {
     FILE*       pFile;
     char        tempBfr[32];
-    ULONG       retVal;
+    uint32_t    retVal;
 
     pFile = fopen(filePath, "r");
     if (pFile == NULL)

@@ -148,11 +148,11 @@ static void dumpConfig (void)
     
     for (channel = 0; channel < 8; channel++)
     {
-        if (((VP_IF_DATA *)wvWork.stationData)->listenChannels & ((UCHAR) 1 << channel))
+        if (((VP_IF_DATA *)wvWork.stationData)->listenChannels & ((uint8_t) 1 << channel))
         {
-            UCHAR sensorType = ((VP_IF_DATA *)wvWork.stationData)->transmitterType[channel*2] & 0xF;
-            UCHAR humidityIndex = (((VP_IF_DATA *)wvWork.stationData)->transmitterType[channel*2 + 1] & (UCHAR) 0xF0) >> 4;
-            UCHAR temperatureIndex = ((VP_IF_DATA *)wvWork.stationData)->transmitterType[channel*2 + 1] & 0xF;
+            uint8_t sensorType = ((VP_IF_DATA *)wvWork.stationData)->transmitterType[channel*2] & 0xF;
+            uint8_t humidityIndex = (((VP_IF_DATA *)wvWork.stationData)->transmitterType[channel*2 + 1] & (uint8_t) 0xF0) >> 4;
+            uint8_t temperatureIndex = ((VP_IF_DATA *)wvWork.stationData)->transmitterType[channel*2 + 1] & 0xF;
             printf ("Listening on channel:    %d for ", channel + 1);
             switch ((VPRO_SENSOR_TYPES) sensorType)
             {
@@ -305,7 +305,7 @@ int main (int argc, char *argv[])
     int         temp, temp1;
     float       tempf;
     char        *tptr, host[128], port[16];
-    ULONG       (*radsysFptr) (UCHAR systemID);
+    ULONG       (*radsysFptr) (uint8_t systemID);
     
     if (argc < 3)
     {
@@ -827,3 +827,10 @@ int main (int argc, char *argv[])
     (*(wvWork.medium.exit)) (&wvWork.medium);
     exit (0);
 }
+
+// Retrieve exit status:
+int wviewdIsExiting(void)
+{
+    return wvWork.exiting;
+}
+

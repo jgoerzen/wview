@@ -129,9 +129,24 @@ static void ethernetExit (WVIEW_MEDIUM *med)
     if (eth->sockId)
         radSocketDestroy (eth->sockId);
     
-    free (eth);
-    
     return;
+}
+
+static int ethernetRestart (WVIEW_MEDIUM *med)
+{
+    ethernetExit(med);
+    radMsgLog (PRI_HIGH, "ethernetRestart: attempting socket restart");
+    while ((!wviewdIsExiting()) && (ethernetInit(med, NULL) == ERROR))
+    {
+        radMsgLog (PRI_HIGH, "ethernetRestart: socket restart failed");
+        radUtilsSleep(5000);
+        radMsgLog (PRI_HIGH, "ethernetRestart: retrying socket restart");
+    }
+    if (!wviewdIsExiting())
+    {
+        radMsgLog (PRI_HIGH, "ethernetRestart: socket recovered");
+    }
+    return OK;
 }
 
 static int ethernetWrite (WVIEW_MEDIUM *med, void *buffer, int length)
@@ -140,9 +155,16 @@ static int ethernetWrite (WVIEW_MEDIUM *med, void *buffer, int length)
     int             retVal;
 
     retVal = radSocketWriteExact (eth->sockId, buffer, length);
-    if (retVal != length)
+    if (retVal <= 0)
     {
-        radMsgLog (PRI_HIGH, "ethernetWrite: radSocketWriteExact failed: %d: %s",
+        // Socket error; try to re-establish:
+        radMsgLog (PRI_HIGH, "ethernetWrite: write error!");
+        ethernetRestart(med);
+        return ERROR;
+    }
+    else if (retVal != length)
+    {
+        radMsgLog (PRI_HIGH, "ethernetWrite: failed: errno %d: %s",
                    errno, strerror(errno));
         return ERROR;
     }
@@ -153,24 +175,101 @@ static int ethernetWrite (WVIEW_MEDIUM *med, void *buffer, int length)
 static int ethernetReadExact (WVIEW_MEDIUM *med, void *bfr, int len, int msTimeout)
 {
     MEDIUM_ETHERNET *eth = (MEDIUM_ETHERNET *)med->workData;
-    int             rval, cumTime = 0, index = 0;
-    ULONGLONG       readTime;
-    UCHAR           *ptr = (UCHAR *)bfr;
+    int             rval, cumTime = 0, index = 0, doRecover = FALSE;
+    uint64_t        readTime;
+    uint8_t         *ptr = (uint8_t *)bfr;
+    fd_set          rfds, wfds;
+    struct timeval  waitTime;          
 
     while (index < len && cumTime < msTimeout)
     {
         readTime = radTimeGetMSSinceEpoch ();
-        rval = radSocketReadExact (eth->sockId, &ptr[index], len - index);
-        if (rval < 0)
+        doRecover = FALSE;
+        if (IsBlocking(eth->sockId))
         {
-            if (errno != EINTR && errno != EAGAIN)
+            rval = radSocketReadExact (eth->sockId, &ptr[index], len - index);
+            if ((rval == ERROR) || (rval == 0))
             {
-                return ERROR;
+                // Far end close/error; try to re-establish the socket:
+                doRecover = TRUE;
             }
         }
-        else if (IsBlocking(eth->sockId) && rval == 0)
+        else
         {
-            // Far-end closed:
+            waitTime.tv_sec = (msTimeout-cumTime)/1000;
+            waitTime.tv_usec = ((msTimeout-cumTime)%1000)*1000;
+            FD_ZERO(&rfds);
+            FD_ZERO(&wfds);
+            FD_SET(radSocketGetDescriptor(eth->sockId), &rfds);
+            rval = select(radSocketGetDescriptor(eth->sockId) + 1,
+                          &rfds,
+                          &wfds,
+                          (fd_set*)0,
+                          &waitTime);
+            if (rval > 0)
+            {
+                if (FD_ISSET(radSocketGetDescriptor(eth->sockId), &rfds))
+                {
+                    // Socket ready for reading:
+                    rval = radSocketReadExact (eth->sockId, &ptr[index], len - index);
+                    if (rval < 0)
+                    {
+                        if (errno == EINTR || errno == EAGAIN)
+                        {
+                            // Try again:
+                            rval = 0;
+                        }
+                        else
+                        {
+                            radMsgLog (PRI_HIGH, "ethernetReadExact: read error: %d: %s",
+                                       errno, strerror(errno));
+                            doRecover = TRUE;
+                        }
+                    }
+                    else if (rval == 0)
+                    {
+                        // Far end close/error; try to re-establish the socket:
+                        radMsgLog (PRI_HIGH, "ethernetReadExact: far-end appears to have closed.");
+                        doRecover = TRUE;
+                    }
+                }
+                else
+                {
+                    rval = 0;
+                }
+            }
+            else
+            {
+                // select returned <= 0:
+                if (rval < 0)
+                {
+                    if (errno == EINTR || errno == EAGAIN)
+                    {
+                        rval = 0;           // Try again:
+                    }
+                    else
+                    {
+                        // Recover for all other errors.
+                        radMsgLog (PRI_HIGH, "ethernetReadExact: select error: %d: %s",
+                                   errno, strerror(errno));
+                        doRecover = TRUE;
+                    }
+                }
+                else
+                {
+                    // Select timed out, return ERROR.
+                    return ERROR;
+                }
+            }
+        }
+
+        // Do we need to attempt recovery?
+        if (doRecover)
+        {
+            radMsgLog (PRI_HIGH, "ethernetReadExact: attempting socket recovery");
+            ethernetRestart(med);
+
+            // Go ahead and return ERROR, the caller can try again.
             return ERROR;
         }
         else
@@ -205,9 +304,9 @@ if (index < len && len > 2)
 static void ethernetFlush (WVIEW_MEDIUM *med, int queue)
 {
     MEDIUM_ETHERNET *eth = (MEDIUM_ETHERNET *)med->workData;
-    UCHAR           temp[SERIAL_BYTE_LENGTH_MAX];
+    uint8_t         temp[SERIAL_BYTE_LENGTH_MAX];
     int             rval, cumTime = 0;
-    ULONGLONG       readTime;
+    uint64_t        readTime;
 
     while (cumTime < ETH_FLUSH_TIME)
     {
@@ -279,6 +378,7 @@ int ethernetMediumInit (WVIEW_MEDIUM *medium, char *hostname, int port)
     
     medium->init        = ethernetInit;
     medium->exit        = ethernetExit;
+    medium->restart     = ethernetRestart;
     medium->read        = ethernetReadExact;
     medium->write       = ethernetWrite;
     medium->flush       = ethernetFlush;

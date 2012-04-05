@@ -77,11 +77,8 @@
 
 // Weather Station buffer parameters:
 #define WH1080_RAIN_MAX             0x10000     // Wrap value for rain counter
-#define WH1080_BUFFER_SIZE          0x10000     // Size of total buffer 4096x 16bytes
-#define WH1080_BUFFER_START         0x100       // Size of fixed block 16x16 bytes, 
-                                                // start of up to 4080 buffer records
-#define WH1080_BUFFER_END           0xFFF0      // Last buffer record
-#define WH1080_BUFFER_RECORD        0x10        // Size of one buffer record
+#define WH1080_BUFFER_START         0x100       // Size of fixed block
+                                                // start of buffer records
 #define WH1080_BUFFER_CHUNK         0x20        // Size of chunk received over USB
 
 // Weather Station record memory positions:
@@ -148,8 +145,8 @@ typedef struct
 typedef struct
 {
     WH1080_DATA     sensorData;
-    UCHAR           controlBlock[WH1080_BUFFER_CHUNK];
-    UCHAR           recordBlock[WH1080_BUFFER_CHUNK];
+    uint8_t         controlBlock[WH1080_BUFFER_CHUNK];
+    uint8_t         recordBlock[WH1080_BUFFER_CHUNK];
     int             lastRecord;
 } WH1080_WORK;
 

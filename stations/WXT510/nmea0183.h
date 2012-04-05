@@ -116,7 +116,7 @@ NMEA0183_DATA;
 typedef struct
 {
     NMEA0183_DATA   sensorData;
-    USHORT          sensorStatus;
+    uint16_t        sensorStatus;
 
 }
 NMEA0183_WORK;

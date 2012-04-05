@@ -147,15 +147,32 @@ int vproStartProcState (int state, void *stimulus, void *data)
             return VPRO_STATE_ERROR;
         }
 
-        if (vpifSendDumpAfterRqst (work) == ERROR)
+        if (work->stationGeneratesArchives)
         {
-            radMsgLog (PRI_HIGH, "vproStartProcState: DMPAFT_RQST failed");
-            emailAlertSend(ALERT_TYPE_STATION_ARCHIVE);
-            return VPRO_STATE_ERROR;
-        }
+            // Sync to console archive records:
+            if (vpifSendDumpAfterRqst (work) == ERROR)
+            {
+                radMsgLog (PRI_HIGH, "vproStartProcState: DMPAFT_RQST failed");
+                emailAlertSend(ALERT_TYPE_STATION_ARCHIVE);
+                return VPRO_STATE_ERROR;
+            }
 
-        radProcessTimerStart (work->ifTimer, VP_RESPONSE_TIMEOUT(work->stationIsWLIP));
-        return VPRO_STATE_DMPAFT_RQST;
+            radProcessTimerStart (work->ifTimer, VP_RESPONSE_TIMEOUT(work->stationIsWLIP));
+            return VPRO_STATE_DMPAFT_RQST;
+        }
+        else
+        {
+            // Just retrieve loop data.
+            if (vpifSendLoopRqst (work, 1) == ERROR)
+            {
+                radMsgLog (PRI_HIGH, "vproStartProcState: LOOP_RQST failed");
+                emailAlertSend(ALERT_TYPE_STATION_LOOP);
+                return VPRO_STATE_ERROR;
+            }
+
+            radProcessTimerStart (work->ifTimer, VP_RESPONSE_TIMEOUT(work->stationIsWLIP));
+            return VPRO_STATE_LOOP_RQST;
+        }
 
     case STIM_QMSG:
     case STIM_EVENT:
@@ -179,7 +196,9 @@ int vproRunState (int state, void *stimulus, void *data)
         // check to see if we need to retry the archive record
         if (((VP_IF_DATA *)(work->stationData))->archiveRetryFlag)
         {
-            radMsgLog (PRI_MEDIUM, "vproRunState: retrying archive record...");
+            radMsgLog (PRI_MEDIUM, "vproRunState: retrying archive record from console:");
+            radMsgLog (PRI_MEDIUM, "vproRunState: you may need to cycle power on the console"
+                                   "(including batteries) to resolve this condition.");
             emailAlertSend(ALERT_TYPE_STATION_ARCHIVE);
             if (vpifWakeupConsole (work) == ERROR)
             {

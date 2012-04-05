@@ -76,7 +76,7 @@ static int readStationData (WVIEWD_WORK *work)
     int                 i, retVal, groupType, checkSum, channel;
     float               tempFloat;
     WMR918_IF_DATA*     ifWorkData = (WMR918_IF_DATA*)work->stationData;
-    UCHAR               *pPacket = &wmr918Work.readData[2];
+    uint8_t             *pPacket = &wmr918Work.readData[2];
 
     // read the first three bytes -- 0xff, 0xff, <type>
     retVal = (*work->medium.read) (&work->medium, &wmr918Work.readData[0], 3, WMR918_READ_TIMEOUT);
@@ -431,35 +431,35 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WMR918_DATA *src)
     {
         tempfloat = src->outHumidity;
         tempfloat += 0.5;
-        dest->outHumidity                   = (USHORT)tempfloat;
+        dest->outHumidity                   = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windSpeed && src->windSpeed <= 250)
     {
         tempfloat = src->windSpeed;
         tempfloat += 0.5;
-        dest->windSpeed                     = (USHORT)tempfloat;
+        dest->windSpeed                     = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windDir && src->windDir <= 360)
     {
         tempfloat = src->windDir;
         tempfloat += 0.5;
-        dest->windDir                       = (USHORT)tempfloat;
+        dest->windDir                       = (uint16_t)tempfloat;
     }
 
     if (0 <= src->maxWindSpeed && src->maxWindSpeed <= 250)
     {
         tempfloat = src->maxWindSpeed;
         tempfloat += 0.5;
-        dest->windGust                      = (USHORT)tempfloat;
+        dest->windGust                      = (uint16_t)tempfloat;
     }
 
     if (0 <= src->maxWindDir && src->maxWindDir <= 360)
     {
         tempfloat = src->maxWindDir;
         tempfloat += 0.5;
-        dest->windGustDir                   = (USHORT)tempfloat;
+        dest->windGustDir                   = (uint16_t)tempfloat;
     }
 
     if (0 <= src->rain)
@@ -509,24 +509,24 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WMR918_DATA *src)
     dest->inTemp                        = src->inTemp;
     tempfloat = src->inHumidity;
     tempfloat += 0.5;
-    dest->inHumidity                    = (USHORT)tempfloat;
+    dest->inHumidity                    = (uint16_t)tempfloat;
 
     dest->extraTemp1                    = (float)src->extraTemp[0];
     tempfloat = src->extraHumidity[0];
     tempfloat += 0.5;
-    dest->extraHumid1                   = (USHORT)tempfloat;
+    dest->extraHumid1                   = (uint16_t)tempfloat;
 
     dest->extraTemp2                    = (float)src->extraTemp[1];
     tempfloat = src->extraHumidity[1];
     tempfloat += 0.5;
-    dest->extraHumid2                   = (USHORT)tempfloat;
+    dest->extraHumid2                   = (uint16_t)tempfloat;
 
     dest->extraTemp3                    = (float)src->extraTemp[2];
 
     // WMR918 specific:
     tempfloat = src->extraHumidity[2];
     tempfloat += 0.5;
-    dest->wmr918Humid3                  = (USHORT)tempfloat;
+    dest->wmr918Humid3                  = (uint16_t)tempfloat;
 
     dest->wmr918Pool                    = src->pool;
 

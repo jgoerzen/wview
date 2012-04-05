@@ -29,7 +29,7 @@ function DisplayStatusColor($status)
 
 function DisplayStatuses()
 {
-    $procs          = array(wview, html, alarms, cwop, http, ftp, ssh, pmon);
+    $procs          = array('wview', 'html', 'alarms', 'cwop', 'http', 'ftp', 'ssh', 'pmon');
     $statusLabels   = array("Not Started", 
                             "Booting", 
                             "Wait for wviewd", 
@@ -60,50 +60,50 @@ function DisplayStatuses()
         {
             $pidstr = "/var/run/wview/" . $process . ".sts";
             $ini_array = parse_ini_file($pidstr);
-            echo "<td>" . DisplayStatusColor($ini_array[status]) . "</td>";
-            echo "<td>" . $statusLabels[$ini_array[status]] . "</td>";
-            if (array_key_exists(message, $ini_array))
+            echo "<td>" . DisplayStatusColor($ini_array['status']) . "</td>";
+            echo "<td>" . $statusLabels[$ini_array['status']] . "</td>";
+            if (array_key_exists('message', $ini_array))
             {
-                echo "<td>" . $ini_array[message] . "</td>";
+                echo "<td>" . $ini_array['message'] . "</td>";
             }
             else
             {
                 echo "<td>&nbsp;</td>";
             }
-            if (array_key_exists(desc0, $ini_array))
+            if (array_key_exists('desc0', $ini_array))
             {
-                echo "<td>" . $ini_array[desc0] . "</td>";
-                echo "<td>" . $ini_array[stat0] . "</td>";
-            }
-            else
-            {
-                echo "<td>&nbsp;</td>";
-                echo "<td>&nbsp;</td>";
-            }
-            if (array_key_exists(desc1, $ini_array))
-            {
-                echo "<td>" . $ini_array[desc1] . "</td>";
-                echo "<td>" . $ini_array[stat1] . "</td>";
+                echo "<td>" . $ini_array['desc0'] . "</td>";
+                echo "<td>" . $ini_array['stat0'] . "</td>";
             }
             else
             {
                 echo "<td>&nbsp;</td>";
                 echo "<td>&nbsp;</td>";
             }
-            if (array_key_exists(desc2, $ini_array))
+            if (array_key_exists('desc1', $ini_array))
             {
-                echo "<td>" . $ini_array[desc2] . "</td>";
-                echo "<td>" . $ini_array[stat2] . "</td>";
+                echo "<td>" . $ini_array['desc1'] . "</td>";
+                echo "<td>" . $ini_array['stat1'] . "</td>";
             }
             else
             {
                 echo "<td>&nbsp;</td>";
                 echo "<td>&nbsp;</td>";
             }
-            if (array_key_exists(desc3, $ini_array))
+            if (array_key_exists('desc2', $ini_array))
             {
-                echo "<td>" . $ini_array[desc3] . "</td>";
-                echo "<td>" . $ini_array[stat3] . "</td>";
+                echo "<td>" . $ini_array['desc2'] . "</td>";
+                echo "<td>" . $ini_array['stat2'] . "</td>";
+            }
+            else
+            {
+                echo "<td>&nbsp;</td>";
+                echo "<td>&nbsp;</td>";
+            }
+            if (array_key_exists('desc3', $ini_array))
+            {
+                echo "<td>" . $ini_array['desc3'] . "</td>";
+                echo "<td>" . $ini_array['stat3'] . "</td>";
             }
             else
             {

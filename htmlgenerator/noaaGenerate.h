@@ -61,9 +61,9 @@ typedef struct
 {
     char            htmlPath    [_MAX_PATH];
     int             isMetric;
-    short           latitude;
-    short           longitude;
-    short           elevation;
+    int16_t         latitude;
+    int16_t         longitude;
+    int16_t         elevation;
     char            stationName[32];
     char            stationCity[32];
     char            stationState[32];
@@ -83,9 +83,9 @@ extern NOAA_ID noaaGenerateInit
 (
     char    *htmlPath,
     int     isMetricUnits,
-    short   latitude,
-    short   longitude,
-    short   elevation,
+    int16_t latitude,
+    int16_t longitude,
+    int16_t elevation,
     char    *name,
     char    *city,
     char    *state,

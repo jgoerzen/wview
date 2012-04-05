@@ -344,9 +344,9 @@ static double dayLength
     return t;
 }
 
-static short packAndGMTAlign (double value)
+static int16_t packAndGMTAlign (double value)
 {
-    short       retVal;
+    int16_t     retVal;
     int         temp;
     time_t      nowtime = time (NULL);
     struct tm   bknTime;
@@ -388,8 +388,8 @@ void sunTimesGetSunRiseSet
     float       latitude,
     float       longitude,
     int         type,               // RS_TYPE_SUN, RS_TYPE_CIVIL, RS_TYPE_ASTRO
-    short       *packedRise,
-    short       *packedSet
+    int16_t     *packedRise,
+    int16_t     *packedSet
 )
 {
     int         rv;
@@ -442,7 +442,7 @@ void sunTimesGetSunRiseSet
 }
 
 // Get day length in packed format
-short sunTimesGetDayLength
+int16_t sunTimesGetDayLength
 (
     int         year,
     int         month,
@@ -453,7 +453,7 @@ short sunTimesGetDayLength
 {
     int         rv;
     double      daylen;
-    short       packedLength;
+    int16_t     packedLength;
 
     daylen = DAY_LENGTH(year, month, day, (double)longitude, (double)latitude);
     daylen *= 60;
@@ -463,12 +463,13 @@ short sunTimesGetDayLength
     return packedLength;
 }
 
+// Debug application:
 #if 0
 int main (void)
 {
     int     year, month, day;
     double  lon, lat;
-    short   packedLen, packedRise, packedSet;
+    int16_t packedLen, packedRise, packedSet;
 
     printf ("Longitude (+ is east) and latitude (+ is north): ");
     scanf ("%lf %lf", &lon, &lat);

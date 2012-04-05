@@ -190,9 +190,9 @@ static void evtHandler
 
 static void timerHandler (void *parm)
 {
-    ULONGLONG   msOffset = radTimeGetMSSinceEpoch ();
+    uint64_t    msOffset = radTimeGetMSSinceEpoch ();
     int         rules;
-    long long   netOffset;
+    int64_t     netOffset;
 
     //  ... allow for timer latency
     if (ftpWork.msOffset == 0)
@@ -215,7 +215,7 @@ static void timerHandler (void *parm)
         ftpWork.msOffset += 60000ULL;
     }
 
-    radProcessTimerStart(ftpWork.timer, (ULONG)(60000LL - netOffset));
+    radProcessTimerStart(ftpWork.timer, (uint32_t)(60000LL - netOffset));
 
 
     //  ... process the ftp rules

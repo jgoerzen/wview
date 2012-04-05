@@ -63,7 +63,7 @@
 //  WVIEW_MSG_TYPE_STATION_DATA (WMRUSB version):
 typedef struct
 {
-    UCHAR           data[WMR_BUFFER_LENGTH];
+    uint8_t         data[WMR_BUFFER_LENGTH];
     int             length;
 }
 __attribute__ ((packed)) WMRUSB_MSG_DATA;
@@ -88,7 +88,7 @@ enum _SensorTypes
     WMR_SENSOR_RAIN                 = 0x02,
     WMR_SENSOR_OUT_TEMP             = 0x04,
     WMR_SENSOR_PRESSURE             = 0x08,
-    WMR_SENSOR_ALL                  = 0x0F
+    WMR_SENSOR_ALL                  = 0x0D      // Exclude requiring the rain sensor
 };
 
 #define WMR_TEMP_SENSOR_OUT         1
@@ -141,7 +141,7 @@ typedef struct
     float   rain24h;
     float   rainAccum;
     float   rainRate;
-    UCHAR   tendency;
+    uint8_t tendency;
 } WMR_DATA;
 
 
@@ -152,11 +152,11 @@ typedef struct
     int                 started;
     int                 reopenNeeded;
     WMR_DATA            sensorData;
-    UCHAR               readData[WMR_BUFFER_LENGTH];
+    uint8_t             readData[WMR_BUFFER_LENGTH];
     int                 readIndex;
-    ULONG               heartBeatCounter;
-    ULONG               lastDataRX;
-    UCHAR               dataRXMask;
+    uint32_t            heartBeatCounter;
+    uint32_t            lastDataRX;
+    uint8_t             dataRXMask;
 } WMR_WORK;
 
 

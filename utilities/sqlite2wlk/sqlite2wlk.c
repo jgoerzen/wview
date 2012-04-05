@@ -37,12 +37,12 @@ static void USAGE (void)
     return;
 }
 
-#define GETVALWITHOFFSET(x,y)       ((x <= ARCHIVE_VALUE_NULL) ? 0xff : (UCHAR)(x+y))
-#define GETVALNOOFFSET(x)                   ((x <= ARCHIVE_VALUE_NULL) ? 0xff : (UCHAR)x)
+#define GETVALWITHOFFSET(x,y)       ((x <= ARCHIVE_VALUE_NULL) ? 0xff : (uint8_t)(x+y))
+#define GETVALNOOFFSET(x)                   ((x <= ARCHIVE_VALUE_NULL) ? 0xff : (uint8_t)x)
 
 static void convertArchivePktToWLK(ARCHIVE_PKT* archivePkt, ARCHIVE_RECORD* newRecord, time_t timeStamp)
 {
-    USHORT          temp;
+    uint16_t        temp;
     time_t          tempTime;
 
     // create the silly packed time crap for the record:
@@ -65,26 +65,26 @@ static void convertArchivePktToWLK(ARCHIVE_PKT* archivePkt, ARCHIVE_RECORD* newR
     }
 
     // Set the values we can:
-    newRecord->outTemp          = (short)(archivePkt->value[DATA_INDEX_outTemp]*10);
-    newRecord->highOutTemp      = (short)(archivePkt->value[DATA_INDEX_outTemp]*10);
-    newRecord->lowOutTemp       = (short)(archivePkt->value[DATA_INDEX_outTemp]*10);
-    temp = (USHORT)(archivePkt->value[DATA_INDEX_rain]*100);
+    newRecord->outTemp          = (int16_t)(archivePkt->value[DATA_INDEX_outTemp]*10);
+    newRecord->highOutTemp      = (int16_t)(archivePkt->value[DATA_INDEX_outTemp]*10);
+    newRecord->lowOutTemp       = (int16_t)(archivePkt->value[DATA_INDEX_outTemp]*10);
+    temp = (uint16_t)(archivePkt->value[DATA_INDEX_rain]*100);
     newRecord->rain             = temp;
-    newRecord->highRainRate     = (USHORT)(archivePkt->value[DATA_INDEX_rainRate]*100);
-    newRecord->barometer        = (USHORT)(archivePkt->value[DATA_INDEX_barometer]*1000);
-    newRecord->radiation        = (USHORT)(archivePkt->value[DATA_INDEX_radiation]);
+    newRecord->highRainRate     = (uint16_t)(archivePkt->value[DATA_INDEX_rainRate]*100);
+    newRecord->barometer        = (uint16_t)(archivePkt->value[DATA_INDEX_barometer]*1000);
+    newRecord->radiation        = (uint16_t)(archivePkt->value[DATA_INDEX_radiation]);
     newRecord->windSamples      = 0xffff;
-    newRecord->inTemp           = (short)(archivePkt->value[DATA_INDEX_inTemp]*10);
-    newRecord->inHumidity       = (UCHAR)archivePkt->value[DATA_INDEX_inHumidity];
-    newRecord->outHumidity      = (UCHAR)archivePkt->value[DATA_INDEX_outHumidity];
-    newRecord->avgWindSpeed     = (UCHAR)archivePkt->value[DATA_INDEX_windSpeed];
-    newRecord->highWindSpeed    = (UCHAR)archivePkt->value[DATA_INDEX_windGust];
-    newRecord->highWindDir      = (UCHAR)(archivePkt->value[DATA_INDEX_windGustDir] / 22.5);
-    newRecord->prevWindDir      = (UCHAR)(archivePkt->value[DATA_INDEX_windDir] / 22.5);
-    newRecord->UV               = (UCHAR)(archivePkt->value[DATA_INDEX_UV]*10);
-    newRecord->ET               = (UCHAR)(archivePkt->value[DATA_INDEX_ET]*1000);
-    newRecord->highRadiation    = (USHORT)(archivePkt->value[DATA_INDEX_radiation]);
-    newRecord->highUV           = (UCHAR)(archivePkt->value[DATA_INDEX_UV]*10);
+    newRecord->inTemp           = (int16_t)(archivePkt->value[DATA_INDEX_inTemp]*10);
+    newRecord->inHumidity       = (uint8_t)archivePkt->value[DATA_INDEX_inHumidity];
+    newRecord->outHumidity      = (uint8_t)archivePkt->value[DATA_INDEX_outHumidity];
+    newRecord->avgWindSpeed     = (uint8_t)archivePkt->value[DATA_INDEX_windSpeed];
+    newRecord->highWindSpeed    = (uint8_t)archivePkt->value[DATA_INDEX_windGust];
+    newRecord->highWindDir      = (uint8_t)(archivePkt->value[DATA_INDEX_windGustDir] / 22.5);
+    newRecord->prevWindDir      = (uint8_t)(archivePkt->value[DATA_INDEX_windDir] / 22.5);
+    newRecord->UV               = (uint8_t)(archivePkt->value[DATA_INDEX_UV]*10);
+    newRecord->ET               = (uint8_t)(archivePkt->value[DATA_INDEX_ET]*1000);
+    newRecord->highRadiation    = (uint16_t)(archivePkt->value[DATA_INDEX_radiation]);
+    newRecord->highUV           = (uint8_t)(archivePkt->value[DATA_INDEX_UV]*10);
     newRecord->fcstRule         = 0xff;
     newRecord->leafTemp1        = GETVALWITHOFFSET(archivePkt->value[DATA_INDEX_leafTemp1],90);
     newRecord->leafTemp2        = GETVALWITHOFFSET(archivePkt->value[DATA_INDEX_leafTemp2],90);

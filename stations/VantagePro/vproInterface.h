@@ -96,23 +96,23 @@ typedef enum
 //  ... define the messages we receive
 typedef struct
 {
-    UCHAR               interval;
-    USHORT              crc;
+    uint8_t             interval;
+    uint16_t            crc;
 }__attribute__ ((packed)) ARCHIVE_INTERVAL;
 
 typedef struct
 {
-    USHORT              pages;
-    USHORT              firstRecIndex;
-    USHORT              crc;
+    uint16_t            pages;
+    uint16_t            firstRecIndex;
+    uint16_t            crc;
 }__attribute__ ((packed)) DMPAFT_HDR;
 
 typedef struct
 {
-    UCHAR               seqNo;
+    uint8_t             seqNo;
     ARCHIVE_RECORD      record[5];
-    UCHAR               unused[4];
-    USHORT              crc;
+    uint8_t             unused[4];
+    uint16_t            crc;
 }__attribute__ ((packed)) ARCHIVE_PAGE;
 
 //  ... serial format
@@ -120,58 +120,58 @@ typedef struct
 */
 typedef struct
 {
-    UCHAR               name[4];
-    UCHAR               type;
-    USHORT              nextRecord;
-    USHORT              barometer;
-    short               inTemp;
-    UCHAR               inHumidity;
-    short               outTemp;
-    UCHAR               windSpeed;
-    UCHAR               tenMinuteAvgWindSpeed;
-    USHORT              windDir;
-    UCHAR               extraTemp1;
-    UCHAR               extraTemp2;
-    UCHAR               extraTemp3;
-    UCHAR               resvExtraTemps[4];
-    UCHAR               soilTemp1;
-    UCHAR               soilTemp2;
-    UCHAR               soilTemp3;
-    UCHAR               soilTemp4;
-    UCHAR               leafTemp1;
-    UCHAR               leafTemp2;
-    UCHAR               resvLeafTemp[2];
-    UCHAR               outHumidity;
-    UCHAR               extraHumid1;
-    UCHAR               extraHumid2;
-    UCHAR               resvHumidity[5];
-    USHORT              rainRate;
-    UCHAR               UV;
-    USHORT              radiation;
-    USHORT              stormRain;
-    USHORT              stormStartDate;
-    USHORT              dayRain;
-    USHORT              monthRain;
-    USHORT              yearRain;
-    USHORT              dayET;
-    USHORT              monthET;
-    USHORT              yearET;
-    UCHAR               soilMoist1;
-    UCHAR               soilMoist2;
-    UCHAR               resvSoilMoist[2];
-    UCHAR               leafWet1;
-    UCHAR               leafWet2;
-    UCHAR               resvLeafWet[2];
-    UCHAR               resvAlarms[16];
-    UCHAR               txBatteryStatus;
-    USHORT              consBatteryVoltage;
-    UCHAR               forecastIcon;
-    UCHAR               forecastRule;
-    USHORT              sunrise;
-    USHORT              sunset;
-    UCHAR               lf;
-    UCHAR               cr;
-    USHORT              crc;
+    uint8_t             name[4];
+    uint8_t             type;
+    uint16_t            nextRecord;
+    uint16_t            barometer;
+    int16_t             inTemp;
+    uint8_t             inHumidity;
+    int16_t             outTemp;
+    uint8_t             windSpeed;
+    uint8_t             tenMinuteAvgWindSpeed;
+    uint16_t            windDir;
+    uint8_t             extraTemp1;
+    uint8_t             extraTemp2;
+    uint8_t             extraTemp3;
+    uint8_t             resvExtraTemps[4];
+    uint8_t             soilTemp1;
+    uint8_t             soilTemp2;
+    uint8_t             soilTemp3;
+    uint8_t             soilTemp4;
+    uint8_t             leafTemp1;
+    uint8_t             leafTemp2;
+    uint8_t             resvLeafTemp[2];
+    uint8_t             outHumidity;
+    uint8_t             extraHumid1;
+    uint8_t             extraHumid2;
+    uint8_t             resvHumidity[5];
+    uint16_t            rainRate;
+    uint8_t             UV;
+    uint16_t            radiation;
+    uint16_t            stormRain;
+    uint16_t            stormStartDate;
+    uint16_t            dayRain;
+    uint16_t            monthRain;
+    uint16_t            yearRain;
+    uint16_t            dayET;
+    uint16_t            monthET;
+    uint16_t            yearET;
+    uint8_t             soilMoist1;
+    uint8_t             soilMoist2;
+    uint8_t             resvSoilMoist[2];
+    uint8_t             leafWet1;
+    uint8_t             leafWet2;
+    uint8_t             resvLeafWet[2];
+    uint8_t             resvAlarms[16];
+    uint8_t             txBatteryStatus;
+    uint16_t            consBatteryVoltage;
+    uint8_t             forecastIcon;
+    uint8_t             forecastRule;
+    uint16_t            sunrise;
+    uint16_t            sunset;
+    uint8_t             lf;
+    uint8_t             cr;
+    uint16_t            crc;
 }__attribute__ ((packed)) LOOP_DATA;
 
 
@@ -180,16 +180,16 @@ typedef struct
 {
     STATES_ID       stateMachine;
     SER_MSG_TYPES   reqMsgType;
-    short           elevation;
-    USHORT          archivePages;
-    USHORT          archiveCurrentPage;
-    USHORT          archiveRecOffset;
+    int16_t         elevation;
+    uint16_t        archivePages;
+    uint16_t        archiveCurrentPage;
+    uint16_t        archiveRecOffset;
     int             rxCheckGood;
     int             rxCheckMissed;
     int             rxCheckCRC;
     int             doRXCheck;
     char            rxCheck[64];
-    USHORT          rxCheckPercent;
+    uint16_t        rxCheckPercent;
     int             timeSyncFlag;
     int             archiveRetryFlag;
     int             doLoopFlag;
@@ -199,15 +199,15 @@ typedef struct
     // vpconfig only
     char            fwVersion[32];
     int             rainSeasonStart;
-    short           windDirectionCal;
-    UCHAR           listenChannels;
-    UCHAR           retransmitChannel;
-    UCHAR           transmitterType[16];
+    int16_t         windDirectionCal;
+    uint8_t         listenChannels;
+    uint8_t         retransmitChannel;
+    uint8_t         transmitterType[16];
     int             rainCollectorSize;
     int             windCupSize;
 
     // rain
-    USHORT          RainCollectorType;
+    uint16_t        RainCollectorType;
     float           rainTicksPerInch;
 
 } VP_IF_DATA;
@@ -235,12 +235,12 @@ extern int vpifWakeupConsole (WVIEWD_WORK *work);
 extern int vpifGetTime
 (
     WVIEWD_WORK *work,
-    USHORT      *year,
-    USHORT      *month,
-    USHORT      *day,
-    USHORT      *hour,
-    USHORT      *minute,
-    USHORT      *second
+    uint16_t    *year,
+    uint16_t    *month,
+    uint16_t    *day,
+    uint16_t    *hour,
+    uint16_t    *minute,
+    uint16_t    *second
 );
 
 // ... get the console's stored latitude and longitude
@@ -261,12 +261,12 @@ extern int vpifGetRainCollectorSize (WVIEWD_WORK *work);
 extern int vpifSetTime
 (
     WVIEWD_WORK *work,
-    USHORT      year,               // ex: 2001 1998 2004
-    USHORT      month,
-    USHORT      day,
-    USHORT      hour,               // 24 hours
-    USHORT      minute,
-    USHORT      second
+    uint16_t    year,               // ex: 2001 1998 2004
+    uint16_t    month,
+    uint16_t    day,
+    uint16_t    hour,               // 24 hours
+    uint16_t    minute,
+    uint16_t    second
 );
 
 // ... set the GMT offset for the Vantage Pro console;

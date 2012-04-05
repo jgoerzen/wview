@@ -112,8 +112,8 @@ static int usbhidRead
 )
 {
     int                     rval, cumTime = 0, index = 0;
-    ULONGLONG               readTime;
-    UCHAR                   *ptr = (UCHAR *)buffer;
+    uint64_t                readTime;
+    uint8_t                 *ptr = (uint8_t *)buffer;
     MEDIUM_USBHID           *usbhidWork = (MEDIUM_USBHID *)medium->workData;
 
     while (index < length && cumTime < msTimeout)
@@ -160,9 +160,9 @@ static int usbhidReadSpecial
 )
 {
     int                     rval, cumTime = 0, index = 0, i, blockLen;
-    ULONGLONG               readTime;
-    UCHAR                   *ptr = (UCHAR *)buffer;
-    UCHAR                   readBuf[8];
+    uint64_t                readTime;
+    uint8_t                 *ptr = (uint8_t *)buffer;
+    uint8_t                 readBuf[8];
     MEDIUM_USBHID           *usbhidWork = (MEDIUM_USBHID *)medium->workData;
 
     while (index < length && cumTime < msTimeout)
@@ -223,7 +223,7 @@ static int usbhidWrite
 {
     int                     retVal, index = 0;
     MEDIUM_USBHID           *usbhidWork = (MEDIUM_USBHID *)medium->workData;
-    UCHAR*                  sendPtr = (UCHAR*)buffer;
+    uint8_t*                sendPtr = (uint8_t*)buffer;
 
     // Write in 8-byte chunks:
     while (index < length)
@@ -262,8 +262,8 @@ static int usbhidWrite
 int usbhidMediumInit
 (
     WVIEW_MEDIUM    *medium,
-    USHORT          vendor_id,
-    USHORT          product_id,
+    uint16_t        vendor_id,
+    uint16_t        product_id,
     int             enableDebug
 )
 {

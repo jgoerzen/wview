@@ -13,7 +13,7 @@
         08/30/03        M.S. Teel       0               Original
         02/16/2008      M.B. Clark      1               Added ability to customize color/size
                                                           of plots using graphics.conf
-	05/16/2008       W. Krenn        2               isDualUnits for Chart	   
+        05/16/2008      W. Krenn        2               isDualUnits for Chart	   
  
   NOTES:
         
@@ -156,7 +156,7 @@ int htmlgenGetMultiChartDefaultSecondLine (void);
 int htmlgenGetMultiChartDefaultThirdLine (void);
 int htmlgenGetMultiChartDefaultFourthLine (void);
 
-extern int htmlgenOutputFiles (HTML_MGR_ID id, ULONGLONG startTime);
+extern int htmlgenOutputFiles (HTML_MGR_ID id, uint64_t startTime);
 
 extern int htmlgenMesonetFile (HTML_MGR_ID id, WVIEW_MSG_ARCHIVE_NOTIFY *armsg);
 
@@ -328,7 +328,6 @@ extern int htmlGenPngDialInit (char *workingDir);
 extern int htmlGenPngDialWind
 (
     char            *fname,
-    int             isMetricUnits,
     int             direction,               // 0 - 359 degrees
     int             highDirection,           // 0-359 degrees
     int             speed,

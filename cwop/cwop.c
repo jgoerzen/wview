@@ -59,12 +59,12 @@ static char*                cwopStatusLabels[STATUS_STATS_MAX] =
 
 // From Gerry Creager: autogenerate passcode for non-CW/DW stations:
 #define kKey            0x73e2                      // This is the seed for the key
-static short getPasscode (char *callSign)
+static int16_t getPasscode (char *callSign)
 {
     char    rootCall[16];
     char*   p1 = rootCall;
-    short   hash;
-    short   i, len;
+    int16_t hash;
+    int16_t i, len;
     char*   ptr = rootCall;
 
     while ((*callSign != '-') && (*callSign != '\0')) 
@@ -82,7 +82,7 @@ static short getPasscode (char *callSign)
 
     hash = kKey;                                    // Initialize with the key value
     i = 0;
-    len = (short)strlen (rootCall);
+    len = (int16_t)strlen (rootCall);
 
     while (i < len) 
     {
@@ -92,7 +92,8 @@ static short getPasscode (char *callSign)
         i += 2;
     }
 
-    return (hash & 0x7fff);                         // mask off the high bit so number is always positive
+    return (hash & 0x7fff);                         // mask off the high bit so 
+                                                    // result is always positive
 }
 
 static void processCWOP ()
@@ -150,8 +151,15 @@ static void processCWOP ()
 
         length += sprintf (&cwopBuffer[length], "t%3.3d", Notify.temp/10);
     }
-    
-    length += sprintf (&cwopBuffer[length], "P%3.3d", Notify.rainDay);
+
+    if (Notify.rainHour >= 0)
+    {
+        length += sprintf (&cwopBuffer[length], "r%3.3d", (int)(Notify.rainHour*100));
+    }
+    if (Notify.rainDay >= 0)
+    {
+        length += sprintf (&cwopBuffer[length], "p%3.3d", (int)(Notify.rainDay*100));
+    }
     
     if (Notify.humidity >= 0 && Notify.humidity <= 100)
     {
@@ -160,36 +168,29 @@ static void processCWOP ()
     
     length += sprintf (&cwopBuffer[length], "b%5.5d", 
                        (int)(10 * wvutilsConvertINHGToHPA((float)Notify.altimeter/1000.0)));
+
+    // If there is radiation present, send it:
+    if (Notify.radiation <= 1800)
+    {
+        length += sprintf (&cwopBuffer[length], "L%3.3d",
+                           ((Notify.radiation <= 999) ? (int)Notify.radiation : 999));
+    }
+
     sprintf (&cwopBuffer[length], ".%s", wvutilsCreateCWOPVersion(globalWviewVersionStr));
 
-
-    // connect to the CWOP server - try the primary then secondary then tertiary
-    socket = radSocketClientCreate (cwopWork.server1, cwopWork.portNo1);
+    // connect to the CWOP server - try the primary then secondary then tertiary:
+    socket = radSocketClientCreateAny(cwopWork.server1, cwopWork.portNo1);
     if (socket == NULL)
     {
-        statusUpdateMessage("CWOP-connect: failed to connect to server");
-        statusIncrementStat(CWOP_STATS_CONNECT_ERRORS);
-        wvutilsLogEvent (PRI_MEDIUM, "CWOP-connect: failed to connect to %s:%d",
-                         cwopWork.server1, cwopWork.portNo1);
-        
         // try the secondary server
-        socket = radSocketClientCreate (cwopWork.server2, cwopWork.portNo2);
+        socket = radSocketClientCreateAny(cwopWork.server2, cwopWork.portNo2);
         if (socket == NULL)
         {
-            statusUpdateMessage("CWOP-connect: failed to connect to server");
-            statusIncrementStat(CWOP_STATS_CONNECT_ERRORS);
-            wvutilsLogEvent (PRI_MEDIUM, "CWOP-connect: failed to connect to %s:%d",
-                             cwopWork.server2, cwopWork.portNo2);
-        
             // try the tertiary server
-            socket = radSocketClientCreate (cwopWork.server3, cwopWork.portNo3);
+            socket = radSocketClientCreateAny(cwopWork.server3, cwopWork.portNo3);
             if (socket == NULL)
             {
                 // we are all out of luck this time!
-                statusUpdateMessage("CWOP-connect: failed to connect to server");
-                statusIncrementStat(CWOP_STATS_CONNECT_ERRORS);
-                wvutilsLogEvent (PRI_MEDIUM, "CWOP-connect: failed to connect to %s:%d",
-                                 cwopWork.server3, cwopWork.portNo3);
                 radMsgLog (PRI_HIGH, 
                            "CWOP-connect: failed to connect to all 3 APRS servers!");
                 return;
@@ -292,8 +293,7 @@ static int waitForWviewDaemon (void)
     while (!done)
     {
         radUtilsSleep (50);
-        
-        
+
         if ((retVal = radQueueRecv (radProcessQueueGetID (),
                                     srcQName,
                                     &msgType,
@@ -317,9 +317,9 @@ static int waitForWviewDaemon (void)
             // yes!
             done = TRUE;
             cwopWork.reportInterval = ((WVIEW_MSG_STATION_INFO*)recvBfr)->archiveInterval;
-            if (cwopWork.reportInterval < 10)
+            if (cwopWork.reportInterval < 5)
             {
-                cwopWork.reportInterval = 10;
+                cwopWork.reportInterval = 5;
             }
         }
         else if (msgType == WVIEW_MSG_TYPE_SHUTDOWN)
@@ -669,9 +669,9 @@ int main (int argc, char *argv[])
         }
         else
         {
-            cwopWork.callSignOffset = (sValue[strlen(sValue)-1] % 10);
+            cwopWork.callSignOffset = (sValue[strlen(sValue)-1] % 5);
         }
-        cwopWork.callSignOffset %= 10;
+        cwopWork.callSignOffset %= 5;
     }
 
     // get the primary APRS server

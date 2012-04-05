@@ -123,11 +123,11 @@ static int verifyChecksum (char *inLine)
 static int readLineFromStation (WVIEWD_WORK *work, char *store, int msTime)
 {
     char        buffer[NMEA_BYTE_LENGTH_MAX];
-    ULONGLONG   readTime = radTimeGetMSSinceEpoch() + (ULONGLONG)msTime;
+    uint64_t   readTime = radTimeGetMSSinceEpoch() + (uint64_t)msTime;
     int         retVal, timeToRead, done = FALSE, byteCount = 0;
 
     // we read until we see a <CR><LF> as a line terminator
-    while ((timeToRead = (ULONG)(readTime - radTimeGetMSSinceEpoch())) > 0)
+    while ((timeToRead = (uint32_t)(readTime - radTimeGetMSSinceEpoch())) > 0)
     {
         retVal = (*work->medium.read) (&work->medium, &buffer[byteCount], 1, timeToRead);
         if (retVal != 1)

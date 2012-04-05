@@ -10,9 +10,10 @@
 #
 # History:
 # Engineer	  Date	    Ver   Comments
-# MS Teel	  02/05/08   1    Original
-# MS Teel     09/13/08   2    Modify for SQLite configuration DB
-# MS Teel     05/03/09   3    Add non-interactive support
+# MS Teel         02/05/08   1    Original
+# MS Teel         09/13/08   2    Modify for SQLite configuration DB
+# MS Teel         05/03/09   3    Add non-interactive support
+# MS Teel         03/12/12   4    Add exfoliation skin.
 #
 ################################################################################
 
@@ -50,6 +51,7 @@ show_skins()
     echo "wview site skins currently supported:"
     echo "    classic - default wview skin"
     echo "    chrome  - classic with a chrome effect"
+    echo "    exfoliation - a clean implementation by Matthew Wall"
 }
 
 interactive_intro()
@@ -136,6 +138,9 @@ get_user_preferences()
         "chrome" )
             echo "Site skin $SITE_SKIN selected..."
             ;;
+        "exfoliation" )
+            echo "Site skin $SITE_SKIN selected..."
+            ;;
         *)
             echo "$SITE_SKIN not supported!"
             show_skins
@@ -200,6 +205,9 @@ if [ "" != "$1" ]; then
         SITE_SKIN=$1
         INTERACTIVE=0
     elif [ "$1" = "chrome" ]; then
+        SITE_SKIN=$1
+        INTERACTIVE=0
+    elif [ "$1" = "exfoliation" ]; then
         SITE_SKIN=$1
         INTERACTIVE=0
     elif [ "$1" = "remove" ]; then

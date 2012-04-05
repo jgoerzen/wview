@@ -59,6 +59,10 @@
 #include <twiProtocol.h>
 
 
+// Define the rain rate acuumulator period (minutes):
+#define TWI_RAIN_RATE_PERIOD            5
+
+
 
 // define WXT510-specific interface data here
 typedef struct
@@ -69,6 +73,7 @@ typedef struct
     int             archiveInterval;
     TWI_DATA        twiReadings;
     float           totalRain;              // to track accumulator changes
+    WV_ACCUM_ID     rainRateAccumulator;    // to compute rain rate
     int             baudrate;
 } TWI_IF_DATA;
 

@@ -116,8 +116,8 @@ int stationInit
 )
 {
     int             i;
-    time_t          nowTime = time(NULL) - (WV_SECONDS_IN_HOUR * 12);
     ARCHIVE_PKT     recordStore;
+    time_t          nowTime;
 
     memset (&twiWorkData, 0, sizeof(twiWorkData));
     pwviewWork = work;
@@ -250,6 +250,19 @@ int stationInit
 
     twiWorkData.totalRain = 0;
 
+   // Create the rain accumulator (TWI_RAIN_RATE_PERIOD minute age)
+    // so we can compute rain rate:
+    twiWorkData.rainRateAccumulator = sensorAccumInit(TWI_RAIN_RATE_PERIOD);
+
+    // Populate the accumulator with the last TWI_RAIN_RATE_PERIOD minutes:
+    nowTime = time(NULL) - (WV_SECONDS_IN_HOUR/(60/TWI_RAIN_RATE_PERIOD));
+    while ((nowTime = dbsqliteArchiveGetNextRecord(nowTime, &recordStore)) != ERROR)
+    {
+        sensorAccumAddSample(twiWorkData.rainRateAccumulator,
+                             recordStore.dateTime,
+                             recordStore.value[DATA_INDEX_rain]);
+    }
+
     radMsgLog (PRI_STATUS, "Starting station interface: TWI"); 
 
     // initialize the station interface
@@ -274,6 +287,7 @@ int stationInit
     twi12HourTempAvg = sensorAccumInit(60 * 12);
 
     // Load data for the last 12 hours:
+    nowTime = time(NULL) - (WV_SECONDS_IN_HOUR * 12);
     while ((nowTime = dbsqliteArchiveGetNextRecord(nowTime, &recordStore)) != ERROR)
     {
         sensorAccumAddSample(twi12HourTempAvg, 
@@ -317,15 +331,15 @@ int stationGetPosition (WVIEWD_WORK *work)
 {
     // just set the values from our internal store - we retrieved them in
     // stationInit
-    work->elevation     = (short)twiWorkData.elevation;
+    work->elevation     = (int16_t)twiWorkData.elevation;
     if (twiWorkData.latitude >= 0)
-        work->latitude      = (short)((twiWorkData.latitude*10)+0.5);
+        work->latitude      = (int16_t)((twiWorkData.latitude*10)+0.5);
     else
-        work->latitude      = (short)((twiWorkData.latitude*10)-0.5);
+        work->latitude      = (int16_t)((twiWorkData.latitude*10)-0.5);
     if (twiWorkData.longitude >= 0)
-        work->longitude     = (short)((twiWorkData.longitude*10)+0.5);
+        work->longitude     = (int16_t)((twiWorkData.longitude*10)+0.5);
     else
-        work->longitude     = (short)((twiWorkData.longitude*10)-0.5);
+        work->longitude     = (int16_t)((twiWorkData.longitude*10)-0.5);
 
     radMsgLog (PRI_STATUS, "station location: elevation: %d feet",
                work->elevation);
@@ -494,6 +508,7 @@ static void storeLoopPkt (WVIEWD_WORK* work, LOOP_PKT *dest, TWI_DATA *src)
 {
     float           tempfloat;
     static time_t   lastTempUpdate;
+    time_t          nowTime = time(NULL);
 
     // Clear optional data:
     stationClearLoopData(work);
@@ -540,24 +555,24 @@ static void storeLoopPkt (WVIEWD_WORK* work, LOOP_PKT *dest, TWI_DATA *src)
 
     if (0 <= src->humidity && src->humidity <= 100)
     {
-        dest->outHumidity                   = (USHORT)src->humidity;
-        dest->inHumidity                    = (USHORT)src->humidity;
+        dest->outHumidity                   = (uint16_t)src->humidity;
+        dest->inHumidity                    = (uint16_t)src->humidity;
     }
 
     if (0 <= src->windSpeed && src->windSpeed <= 250)
     {
         tempfloat = src->windSpeed;
         tempfloat += 0.5;
-        dest->windSpeed                     = (USHORT)tempfloat;
-        dest->windGust                      = (USHORT)tempfloat;
+        dest->windSpeed                     = (uint16_t)tempfloat;
+        dest->windGust                      = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windDir && src->windDir < 360)
     {
         tempfloat = src->windDir;
         tempfloat += 0.5;
-        dest->windDir                       = (USHORT)tempfloat;
-        dest->windGustDir                   = (USHORT)tempfloat;
+        dest->windDir                       = (uint16_t)tempfloat;
+        dest->windGustDir                   = (uint16_t)tempfloat;
     }
 
     dest->rainRate                          = src->rainrate;
@@ -592,10 +607,18 @@ static void storeLoopPkt (WVIEWD_WORK* work, LOOP_PKT *dest, TWI_DATA *src)
             // Not possible, filter it out:
             dest->sampleRain = 0;
         }
+
+        // Update the rain accumulator:
+        sensorAccumAddSample (twiWorkData.rainRateAccumulator, nowTime, dest->sampleRain);
+        dest->rainRate    = sensorAccumGetTotal (twiWorkData.rainRateAccumulator);
+        dest->rainRate   *= (60/TWI_RAIN_RATE_PERIOD);
     }
     else
     {
         dest->sampleRain = 0;
+        sensorAccumAddSample (twiWorkData.rainRateAccumulator, nowTime, dest->sampleRain);
+        dest->rainRate   = sensorAccumGetTotal (twiWorkData.rainRateAccumulator);
+        dest->rainRate   *= (60/TWI_RAIN_RATE_PERIOD);
     }
 
     return;

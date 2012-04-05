@@ -194,7 +194,7 @@ static int insertDBHistoryData(SQLITE_DATABASE_ID historyDB, HISTORY_DATA* data)
         }
         else
         {
-            radsqliteFieldSetBigIntValue(field, (ULONGLONG)data->startTime);
+            radsqliteFieldSetBigIntValue(field, (uint64_t)data->startTime);
         }
 
         // Delete him:
@@ -226,7 +226,7 @@ static int insertDBHistoryData(SQLITE_DATABASE_ID historyDB, HISTORY_DATA* data)
     }
     else
     {
-        radsqliteFieldSetBigIntValue(field, (ULONGLONG)data->startTime);
+        radsqliteFieldSetBigIntValue(field, (uint64_t)data->startTime);
     }
 
     for (index = 0; index < DATA_INDEX_MAX; index ++)

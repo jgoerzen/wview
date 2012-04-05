@@ -121,20 +121,20 @@ void htmlutilsSetDualUnits (int isMetric, const char *units, char *dualUnits)
         strcpy (dualUnits, "inches");
     }
     else if (strcmp(units,"mph") == 0)
-    {  // if cm then change to inches value
+    {
         strcpy (dualUnits, "km/h");
     }
     else if (strcmp(units,"km/h") == 0)
-    {  // if cm then change to inches value
+    {
         strcpy (dualUnits, "mph");
     }
     else if (strcmp(units,"m/s") == 0)
     {
-        strcpy (dualUnits, "m/s");
+        strcpy (dualUnits, "mph");
     }
     else if (strcmp(units,"knots") == 0)
     {
-        strcpy (dualUnits, "knots");
+        strcpy (dualUnits, "mph");
     }
     else
     { // no conversion no second display

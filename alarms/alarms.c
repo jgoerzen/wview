@@ -1232,7 +1232,7 @@ static void RemoveClient(RADSOCK_ID clientSock)
     }
 }
 
-static void SendNextArchiveRecord(RADSOCK_ID client, ULONG dateTime)
+static void SendNextArchiveRecord(RADSOCK_ID client, uint32_t dateTime)
 {
     ARCHIVE_PKT         recordStore;
     ARCHIVE_PKT         networkStore;
@@ -1280,7 +1280,7 @@ static void ClientDataRX (int fd, void *userData)
 {
     RADSOCK_ID          client = (RADSOCK_ID)userData;
     int                 retVal;
-    ULONG               dateTime;
+    uint32_t            dateTime;
 
     retVal = datafeedSyncStartOfFrame(client);
     switch (retVal)
@@ -1319,6 +1319,12 @@ static void ClientDataRX (int fd, void *userData)
     
             // Now we have the date and time, get busy:
             SendNextArchiveRecord(client, dateTime);
+            break;
+
+        default:
+            statusUpdateMessage("ClientDataRX: socket error during sync - disconnecting");
+            radMsgLog (PRI_HIGH, "ClientDataRX: socket error during sync - disconnecting");
+            RemoveClient(client);
             break;
     }
 

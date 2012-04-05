@@ -328,7 +328,7 @@ static void drawBucket (BUCKET_ID id)
                        gdFontSmall,
                        (x - 5) - (strlen(text[i]) * gdFontSmall->h/2),
                        y,
-                       (UCHAR *)text[i],
+                       (uint8_t *)text[i],
                        id->textcolor);
 
         // right side
@@ -348,7 +348,7 @@ static void drawBucket (BUCKET_ID id)
                            gdFontSmall,
                            x + 4 + gdFontSmall->h/2,
                            y,
-                           (UCHAR *)textR[i],
+                           (uint8_t *)textR[i],
                            id->textcolor);
         }
         else
@@ -358,7 +358,7 @@ static void drawBucket (BUCKET_ID id)
                            gdFontSmall,
                            x + 4 + gdFontSmall->h/2,
                            y,
-                           (UCHAR *)text[i],
+                           (uint8_t *)text[i],
                            id->textcolor);
         }
     }
@@ -371,7 +371,7 @@ static void drawBucket (BUCKET_ID id)
                    gdFontMediumBold,
                    ((id->width - ((gdFontMediumBold->h/2) * (1+strlen (text[0]))))/2),
                    (id->height - (gdFontMediumBold->h*3)) + 4,
-                   (UCHAR *)text[0],
+                   (uint8_t *)text[0],
                    id->textcolor);
 
     // -- Bottom of bucket display --
@@ -429,20 +429,20 @@ static void drawBucket (BUCKET_ID id)
         {
             // no conversion no second display
             id->valueM = id->value;
-            sprintf (text[0], "");
+            text[0][0] = 0;
         }
         gdImageString (id->im,
                        gdFontMediumBold,
                        ((id->width - ((gdFontMediumBold->h/2) * (1+strlen (text[0]))))/2),
                        (id->height - (gdFontMediumBold->h*3)) + 15,
-                       (UCHAR *)text[0],
+                       (uint8_t *)text[0],
                        id->textcolor);
     }
     gdImageString (id->im,
                    gdFontSmall,
                    ((id->width - ((gdFontSmall->h/2) * strlen (id->datetime)))/2) - 2,
                    id->height - (gdFontMediumBold->h - 0),
-                   (UCHAR *)id->datetime,
+                   (uint8_t *)id->datetime,
                    id->textcolor);
 }
 
@@ -457,7 +457,7 @@ static void drawTitle (BUCKET_ID id)
                    gdFontMediumBold,
                    ((id->width - ((gdFontMediumBold->h/2) * strlen (id->title)))/2) - 3,
                    0,
-                   (UCHAR *)id->title,
+                   (uint8_t *)id->title,
                    id->titleFGcolor);
 }
 

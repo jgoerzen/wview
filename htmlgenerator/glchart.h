@@ -46,6 +46,7 @@
 #define GLC_CONTENTS_OFFSET         4
 
 #define MAX_GRAPH_POINTS            1024
+#define MAX_NUMHASH                 64
 
 
 typedef enum
@@ -62,7 +63,7 @@ typedef struct
     int         width;
     int         height;
     char        title[64];
-    char        units[64];
+    char        units[16];
     char        datetime[64];
     int         xdecPlaces;
     int         xnumhashes;
@@ -89,7 +90,7 @@ typedef struct
     int         textcolor;
     int         isTransparent;
     int         isMetric;
-    char        DualUnit[6];
+    char        DualUnit[16];
 } CHART, *CHART_ID;
 
 

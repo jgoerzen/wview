@@ -91,7 +91,8 @@ int stationSendShutdown (WVIEWD_WORK *work)
 int stationSendArchiveNotifications (WVIEWD_WORK *work, float sampleRain)
 {
     WVIEW_MSG_ARCHIVE_NOTIFY    notify;
-    float                       tempfloat;
+    int                         retVal;
+    HISTORY_DATA                store;
 
     notify.dateTime         = work->archiveDateTime;
     notify.intemp           = (int)floorf(work->loopPkt.inTemp * 10);
@@ -107,16 +108,37 @@ int stationSendArchiveNotifications (WVIEWD_WORK *work, float sampleRain)
     notify.hiwspeed         = work->loopPkt.windGust;
     notify.rxPercent        = work->loopPkt.rxCheckPercent;
     notify.sampleRain       = sampleRain;
+    notify.UV               = work->loopPkt.UV;
+    notify.radiation        = work->loopPkt.radiation;
 
-    tempfloat = sensorGetCumulative (&work->sensors.sensor[STF_HOUR][SENSOR_RAIN]);
-    tempfloat *= 100;
-    tempfloat += 0.5;
-    notify.rainHour    = (int)tempfloat;
+    // Grab last 60 minutes and last 24 hours from database:
+    retVal = dbsqliteArchiveGetAverages (FALSE,
+                                         work->archiveInterval,
+                                         &store,
+                                         time(NULL) - WV_SECONDS_IN_HOUR,
+                                         WV_SECONDS_IN_HOUR/SECONDS_IN_INTERVAL(work->archiveInterval));
+    if (retVal <= 0)
+    {
+        notify.rainHour = ARCHIVE_VALUE_NULL;
+    }
+    else
+    {
+        notify.rainHour = store.values[DATA_INDEX_rain];
+    }
 
-    tempfloat = sensorGetCumulative (&work->sensors.sensor[STF_DAY][SENSOR_RAIN]);
-    tempfloat *= 100;
-    tempfloat += 0.5;
-    notify.rainDay     = (int)tempfloat;
+    retVal = dbsqliteArchiveGetAverages (FALSE,
+                                         work->archiveInterval,
+                                         &store,
+                                         time(NULL) - WV_SECONDS_IN_DAY,
+                                         WV_SECONDS_IN_DAY/SECONDS_IN_INTERVAL(work->archiveInterval));
+    if (retVal <= 0)
+    {
+        notify.rainDay = ARCHIVE_VALUE_NULL;
+    }
+    else
+    {
+        notify.rainDay = store.values[DATA_INDEX_rain];
+    }
 
     if (radMsgRouterMessageSend (WVIEW_MSG_TYPE_ARCHIVE_NOTIFY, &notify, sizeof(notify))
         == ERROR)
@@ -217,7 +239,7 @@ int stationProcessIPM (WVIEWD_WORK *work, char *srcQueueName, int msgType, void 
                         loop.loopData.sampleET = 0;
                     if (loop.loopData.radiation == 0xFFFF)
                         loop.loopData.radiation = 0;
-                    if (loop.loopData.UV == 0xFFFF)
+                    if (loop.loopData.UV < 0)
                         loop.loopData.UV = 0;
                     if (loop.loopData.rxCheckPercent == 0xFFFF)
                         loop.loopData.rxCheckPercent = 0;
@@ -504,7 +526,7 @@ void stationClearLoopData (WVIEWD_WORK *work)
 {
     work->loopPkt.sampleET                      = ARCHIVE_VALUE_NULL;
     work->loopPkt.radiation                     = 0xFFFF;
-    work->loopPkt.UV                            = 0xFFFF;
+    work->loopPkt.UV                            = -1;
     work->loopPkt.rxCheckPercent                = 0xFFFF;
     work->loopPkt.wxt510Hail                    = ARCHIVE_VALUE_NULL;
     work->loopPkt.wxt510Hailrate                = ARCHIVE_VALUE_NULL;

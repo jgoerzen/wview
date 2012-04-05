@@ -61,11 +61,6 @@
 #include <arcrecGenerate.h>
 
 
-/*  ... API definitions
-*/
-#define SECONDS_IN_INTERVAL(x)          (x * 60)
-
-
 /*  !!!!!!!!!!!!!!!!!!  HIDDEN, NOT FOR API USE  !!!!!!!!!!!!!!!!!!
 */
 #define TIMER_GENERATE              1
@@ -84,7 +79,6 @@ typedef enum
     HTML_STATS_TEMPLATES_GENERATED
 } HTML_STATS;
 
-
 typedef struct
 {
     pid_t           myPid;
@@ -96,6 +90,7 @@ typedef struct
     char            configFile[WVIEW_STRING2_SIZE];
     int             archiveInterval;
     int             isMetricUnits;
+    HTML_WUNITS     windUnits;
     char            imagePath[WVIEW_STRING2_SIZE];
     char            htmlPath[WVIEW_STRING2_SIZE];
     int             isExtendedData;

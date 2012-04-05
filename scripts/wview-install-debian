@@ -18,7 +18,7 @@
 
 ## These are the only two macros you should need to change:
 INSTALL_PREFIX=/usr/local
-RADLIB_VERSION=2.10.1
+RADLIB_VERSION=2.11.3
 
 
 BUILD_LOC=$INSTALL_PREFIX/src
@@ -72,6 +72,7 @@ apt-get install --yes libsqlite3-dev sqlite3
 apt-get install --yes libgd2-noxpm-dev libssl-dev
 apt-get install --yes sendmail sendemail
 apt-get install --yes libcurl4-openssl-dev
+apt-get install --yes libusb-1.0-0-dev
 
 echo ""
 echo "---------------------------------------------------------------------------" 

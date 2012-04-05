@@ -52,6 +52,7 @@ typedef struct
 {
     RADSOCK_ID      sockId;
     char            host[WVIEW_STRING1_SIZE];
+    WVIEWD_WORK*    wviewWork;
     int             port;
 } MEDIUM_ETHERNET;
 

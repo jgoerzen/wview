@@ -85,8 +85,8 @@
 
 /* Linked List of input reports received from the device. */
 struct input_report {
-    uint8_t *data;
-    size_t len;
+    uint8_t     *data;
+    size_t      len;
     struct input_report *next;
 };
 
@@ -157,8 +157,8 @@ static void register_error(hid_device *device, const char *op)
    USB string #0. */
 static uint16_t get_first_language(libusb_device_handle *dev)
 {
-    uint16_t buf[32];
-    int len;
+    uint16_t    buf[32];
+    int         len;
 
 #ifdef __FreeBSD__
 
@@ -190,7 +190,7 @@ static char *make_path(libusb_device *dev, int interface_number)
     return strdup(str);
 }
 
-struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, unsigned short product_id)
+struct hid_device_info  HID_API_EXPORT *hid_enumerate(uint16_t vendor_id, uint16_t product_id)
 {
     libusb_device **devs;
     libusb_device *dev;
@@ -219,8 +219,8 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
         int interface_num = 0;
 
         int res = libusb_get_device_descriptor(dev, &desc);
-        unsigned short dev_vid = desc.idVendor;
-        unsigned short dev_pid = desc.idProduct;
+        uint16_t dev_vid = desc.idVendor;
+        uint16_t dev_pid = desc.idProduct;
 
         /* HID's are defined at the interface level. */
         if (desc.bDeviceClass != LIBUSB_CLASS_PER_INTERFACE)
@@ -295,7 +295,7 @@ void  HID_API_EXPORT hid_free_enumeration(struct hid_device_info *devs)
     }
 }
 
-hid_device * hid_open(unsigned short vendor_id, unsigned short product_id)
+hid_device * hid_open(uint16_t vendor_id, uint16_t product_id)
 {
     struct hid_device_info *devs, *cur_dev;
     const char *path_to_open = NULL;

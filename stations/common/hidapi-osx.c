@@ -96,12 +96,12 @@ static long get_long_property(IOHIDDeviceRef device, CFStringRef key)
     return 0;
 }
 
-static unsigned short get_vendor_id(IOHIDDeviceRef device)
+static uint16_t get_vendor_id(IOHIDDeviceRef device)
 {
     return get_long_property(device, CFSTR(kIOHIDVendorIDKey));
 }
 
-static unsigned short get_product_id(IOHIDDeviceRef device)
+static uint16_t get_product_id(IOHIDDeviceRef device)
 {
     return get_long_property(device, CFSTR(kIOHIDProductIDKey));
 }
@@ -196,15 +196,14 @@ static wchar_t *dup_wcs(const wchar_t *s)
 
 static int make_path(IOHIDDeviceRef device, char *buf, size_t len)
 {
-    int res;
-    unsigned short vid, pid;
-    char transport[32];
+    int         res;
+    uint16_t    vid, pid;
+    char        transport[32];
 
     buf[0] = '\0';
 
-    res = get_string_property_utf8(
-              device, CFSTR(kIOHIDTransportKey),
-              transport, sizeof(transport));
+    res = get_string_property_utf8(device, CFSTR(kIOHIDTransportKey),
+                                   transport, sizeof(transport));
 
     if (!res)
         return -1;
@@ -230,7 +229,7 @@ static void init_hid_manager()
 }
 
 
-struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, unsigned short product_id)
+struct hid_device_info  HID_API_EXPORT *hid_enumerate(uint16_t vendor_id, uint16_t product_id)
 {
     struct hid_device_info *root = NULL; // return object
     struct hid_device_info *cur_dev = NULL;
@@ -254,8 +253,8 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
     /* Iterate over each device, making an entry for it. */
     for (i = 0; i < num_devices; i++)
     {
-        unsigned short dev_vid;
-        unsigned short dev_pid;
+        uint16_t dev_vid;
+        uint16_t dev_pid;
 #define BUF_LEN 256
 
         wchar_t buf[BUF_LEN];
@@ -328,7 +327,7 @@ void  HID_API_EXPORT hid_free_enumeration(struct hid_device_info *devs)
     }
 }
 
-hid_device * HID_API_EXPORT hid_open(unsigned short vendor_id, unsigned short product_id)
+hid_device * HID_API_EXPORT hid_open(uint16_t vendor_id, uint16_t product_id)
 {
     /* This function is identical to the Linux version. Platform independent. */
     struct hid_device_info *devs, *cur_dev;

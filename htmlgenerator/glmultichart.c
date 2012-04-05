@@ -154,8 +154,8 @@ static void drawGrid (MULTICHART_ID id)
     int             dataPoints, xnumhash, xhashindexlen;
     double          hashwidth, xhashwidth;
     int             numhash, x, y;
-    char            text[64][32], ylabelfmt[24];
-    char            textR[64][32], ylabelfmtR[24];
+    char            text[MAX_NUMHASH][WVIEW_STRING1_SIZE], ylabelfmt[32];
+    char            textR[MAX_NUMHASH][WVIEW_STRING1_SIZE], ylabelfmtR[32];
 
     //  ... calculate the maximum number of hash marks and the units per hash
     //  ... for the x-axis
@@ -238,8 +238,10 @@ static void drawGrid (MULTICHART_ID id)
     id->max = id->min + (id->ystepSize * numhash);
     id->ypixelconstant = (double)(id->imby - id->imty)/(double)(id->max - id->min);
     numhash ++;
-    if (numhash > 64)
-        numhash = 64;
+    if (numhash > MAX_NUMHASH)
+    {
+        numhash = MAX_NUMHASH;
+    }
 
     //  build labels and calculate the maximum y-label width
     sprintf (ylabelfmt, "%%.%1.1df", id->ydecPlaces);
@@ -283,43 +285,85 @@ static void drawGrid (MULTICHART_ID id)
             }
             else if (strcmp(id->DualUnit,"km/h") == 0)
             {
-                minR = wvutilsConvertMilesToKilometers (id->min);
-                stepR = wvutilsConvertMilesToKilometers (id->ystepSize);
-                sprintf (textR[i], "%.0f", minR + (i * stepR));
-            }
-            else if (strcmp(id->DualUnit,"mph") == 0)
-            {
-                minR = wvutilsConvertKilometersToMiles (id->min);
-                stepR = wvutilsConvertKilometersToMiles (id->ystepSize);
-                sprintf (textR[i], "%.0f", minR + (i * stepR));
-            }
-            else if (strcmp(id->title,"m/s") == 0)
-            {
-                if (id->isMetric)
+                if (!strcmp(id->units, "mph"))
+                {
+                    minR = wvutilsConvertMPHToKPH (id->min);
+                    stepR = wvutilsConvertMPHToKPH (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+                else if (!strcmp(id->units, "m/s"))
                 {
                     minR = wvutilsConvertMPSToKPH (id->min);
                     stepR = wvutilsConvertMPSToKPH (id->ystepSize);
                     sprintf (textR[i], "%.0f", minR + (i * stepR));
                 }
-                else
-                {
-                    minR = wvutilsConvertMPSToMPH (id->min);
-                    stepR = wvutilsConvertMPSToMPH (id->ystepSize);
-                    sprintf (textR[i], "%.0f", minR + (i * stepR));
-                }
-            }
-            else if (strcmp(id->title,"knots") == 0)
-            {
-                if (id->isMetric)
+                else if (!strcmp(id->units, "knots"))
                 {
                     minR = wvutilsConvertKnotsToKPH (id->min);
                     stepR = wvutilsConvertKnotsToKPH (id->ystepSize);
                     sprintf (textR[i], "%.0f", minR + (i * stepR));
                 }
-                else
+            }
+            else if (strcmp(id->DualUnit,"mph") == 0)
+            {
+                if (!strcmp(id->units, "km/h"))
+                {
+                    minR = wvutilsConvertKPHToMPH (id->min);
+                    stepR = wvutilsConvertKPHToMPH (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+                else if (!strcmp(id->units, "m/s"))
+                {
+                    minR = wvutilsConvertMPSToMPH (id->min);
+                    stepR = wvutilsConvertMPSToMPH (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+                else if (!strcmp(id->units, "knots"))
                 {
                     minR = wvutilsConvertKnotsToMPH (id->min);
                     stepR = wvutilsConvertKnotsToMPH (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+            }
+            else if (strcmp(id->DualUnit,"m/s") == 0)
+            {
+                if (!strcmp(id->units, "km/h"))
+                {
+                    minR = wvutilsConvertKPHToMPS (id->min);
+                    stepR = wvutilsConvertKPHToMPS (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+                else if (!strcmp(id->units, "mph"))
+                {
+                    minR = wvutilsConvertMPHToMPS (id->min);
+                    stepR = wvutilsConvertMPHToMPS (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+                else if (!strcmp(id->units, "knots"))
+                {
+                    minR = wvutilsConvertKnotsToMPS (id->min);
+                    stepR = wvutilsConvertKnotsToMPS (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+            }
+            else if (strcmp(id->DualUnit,"knots") == 0)
+            {
+                if (!strcmp(id->units, "km/h"))
+                {
+                    minR = wvutilsConvertKPHToKnots (id->min);
+                    stepR = wvutilsConvertKPHToKnots (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+                else if (!strcmp(id->units, "mph"))
+                {
+                    minR = wvutilsConvertMPHToKnots (id->min);
+                    stepR = wvutilsConvertMPHToKnots (id->ystepSize);
+                    sprintf (textR[i], "%.0f", minR + (i * stepR));
+                }
+                else if (!strcmp(id->units, "m/s"))
+                {
+                    minR = wvutilsConvertMPSToKnots (id->min);
+                    stepR = wvutilsConvertMPSToKnots (id->ystepSize);
                     sprintf (textR[i], "%.0f", minR + (i * stepR));
                 }
             }
@@ -373,7 +417,7 @@ static void drawGrid (MULTICHART_ID id)
                        gdFontSmall,
                        (id->imtx - 5) - (strlen(text[i]) * gdFontSmall->h/2),
                        y,
-                       (UCHAR *)text[i],
+                       (uint8_t *)text[i],
                        id->textcolor);
 
         if (strlen(id->DualUnit) > 0 )
@@ -385,7 +429,7 @@ static void drawGrid (MULTICHART_ID id)
                            gdFontSmall,
                            x + gdFontSmall->h/2,
                            y,
-                           (UCHAR *)textR[i],
+                           (uint8_t *)textR[i],
                            id->textcolor);
         }
     }
@@ -414,7 +458,7 @@ static void drawGrid (MULTICHART_ID id)
                        x - ((gdFontSmall->h/2) *
                             (strlen(id->pointnames[dataPoint])/2)),
                        (id->height - (3 * gdFontMediumBold->h)) + 4,
-                       (UCHAR *)id->pointnames[dataPoint],
+                       (uint8_t *)id->pointnames[dataPoint],
                        id->textcolor);
     }
 
@@ -424,7 +468,7 @@ static void drawGrid (MULTICHART_ID id)
                    gdFontSmall,
                    ((id->width - ((gdFontSmall->h/2) * strlen (id->datetime)))/2) - 2,
                    id->height - (gdFontMediumBold->h + 2),
-                   (UCHAR *)id->datetime,
+                   (uint8_t *)id->datetime,
                    id->textcolor);
 }
 
@@ -440,19 +484,6 @@ static void drawTitle (MULTICHART_ID id)
 
     if (strlen(id->DualUnit) != 0)
     {
-        wvstrncpy (xtitle, id->title, sizeof(xtitle));
-        if ((strcmp(id->title,"knots") == 0) || (strcmp(id->title,"m/s") == 0))
-        {
-            if (id->isMetric)
-            {
-                strcpy (xtitle, "km/h");
-            }
-            else
-            {
-                strcpy (xtitle, "mph");
-            }
-        }
-
         for (i = 0; i < id->numdatasets; i ++)
         {
             totalLen += 2;
@@ -461,7 +492,6 @@ static void drawTitle (MULTICHART_ID id)
         totalLen = (id->width - totalLen) - 3;
         totalLen /= 2;
 
-        // totalLen = (((gdFontMediumBold->h/2)+2) * strlen (xtitle))+2;
         for (i = 0; i < id->numdatasets; i ++)
         {
             totalLen += 2;
@@ -469,7 +499,7 @@ static void drawTitle (MULTICHART_ID id)
                            gdFontMediumBold,
                            totalLen,
                            0,
-                           (UCHAR *)id->dataset[i].legend,
+                           (uint8_t *)id->dataset[i].legend,
                            id->dataset[i].lineColor);
 
             totalLen += (((gdFontMediumBold->h/2)+2) * strlen (id->dataset[i].legend));
@@ -479,14 +509,14 @@ static void drawTitle (MULTICHART_ID id)
                        gdFontMediumBold,
                        id->width - (((gdFontMediumBold->h/2)+2) * strlen (id->DualUnit)),
                        0,
-                       (UCHAR *)id->DualUnit,
+                       (uint8_t *)id->DualUnit,
                        id->titleFGcolor);
 
         gdImageString (id->im,
                        gdFontMediumBold,
                        2,
                        0,
-                       (UCHAR *)xtitle,
+                       (uint8_t *)id->units,
                        id->titleFGcolor);
     }
     else
@@ -498,7 +528,7 @@ static void drawTitle (MULTICHART_ID id)
                            gdFontMediumBold,
                            totalLen,
                            0,
-                           (UCHAR *)id->dataset[i].legend,
+                           (uint8_t *)id->dataset[i].legend,
                            id->dataset[i].lineColor);
 
             totalLen += (((gdFontMediumBold->h/2)+2) * strlen (id->dataset[i].legend));
@@ -508,7 +538,7 @@ static void drawTitle (MULTICHART_ID id)
                        gdFontMediumBold,
                        id->width - (((gdFontMediumBold->h/2)+2) * strlen (id->title)),
                        0,
-                       (UCHAR *)id->title,
+                       (uint8_t *)id->title,
                        id->titleFGcolor);
 
     }
@@ -599,7 +629,7 @@ MULTICHART_ID multiChartCreate
 (
     int                     width,
     int                     height,
-    char                    *title,
+    char                    *units,
     int                     numDataSets,
     char                    *legends[]
 )
@@ -622,7 +652,7 @@ MULTICHART_ID multiChartCreate
 
     newId->width = width;
     newId->height = height;
-    wvstrncpy (newId->title, title, sizeof(newId->title));
+    wvstrncpy (newId->units, units, sizeof(newId->units));
 
     //  ... now set the contents coords
     newId->imtx = 5 * gdFontSmall->h/2;
@@ -749,7 +779,7 @@ void multiChartSetTransparency (MULTICHART_ID id, int isTransparent)
 
 void multiChartSetDualUnits (MULTICHART_ID id)
 {
-    htmlutilsSetDualUnits (id->isMetric, id->title, id->DualUnit);
+    htmlutilsSetDualUnits (id->isMetric, id->units, id->DualUnit);
     return;
 }
 

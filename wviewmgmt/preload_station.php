@@ -60,6 +60,7 @@
     $field_Station_Host                     = SqliteDBGetValue($dbID, 'STATION_HOST');
     $field_Station_Port                     = SqliteDBGetValue($dbID, 'STATION_PORT');
     $field_Station_WLIP                     = SqliteDBGetValue($dbID, 'STATION_WLIP');
+    $field_Station_Retrieve_Archive         = SqliteDBGetValue($dbID, 'STATION_RETRIEVE_ARCHIVE');
     $field_Station_DTR                      = SqliteDBGetValue($dbID, 'STATION_DTR');
     $field_Station_Rain_Season_Start        = SqliteDBGetValue($dbID, 'STATION_RAIN_SEASON_START');
     $field_Station_Storm_Trigger_Start      = SqliteDBGetValue($dbID, 'STATION_RAIN_STORM_TRIGGER_START');

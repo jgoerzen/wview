@@ -78,28 +78,28 @@ static WH1080_DECODE_TYPE   decodeVals[] =
 
 // Local methods:
 
-static unsigned short getUSHORT(char* raw)
+static uint16_t getUSHORT(char* raw)
 {
     unsigned char lo = (unsigned char)raw[0];
     unsigned char hi = (unsigned char)raw[1];
     return lo + (hi * 256);
 }
 
-static short getSHORT(char* raw)
+static int16_t getSHORT(char* raw)
 {
     unsigned char lo = (unsigned char)raw[0];
     unsigned char hi = (unsigned char)raw[1];
-    unsigned short us = lo + (hi * 256);
+    uint16_t us = lo + (hi * 256);
     if (us >= 0x8000)                       // Test for sign bit
         return -(us - 0x8000);              // Negative value
     else
         return us;                          // Positive value
 }
 
-static UCHAR bcdDecode(UCHAR byte)
+static uint8_t bcdDecode(uint8_t byte)
 {
-    UCHAR   lo = byte & 0x0F;
-    UCHAR   hi = byte / 16;
+    uint8_t   lo = byte & 0x0F;
+    uint8_t   hi = byte / 16;
 
     return (lo + (hi * 10));
 }
@@ -107,7 +107,7 @@ static UCHAR bcdDecode(UCHAR byte)
 static int decodeSensor(char* raw, enum ws_types ws_type, float scale, float* var)
 {
     float           fresult;
-    unsigned short  usTemp;
+    uint16_t        usTemp;
 
     switch (ws_type)
     {
@@ -172,14 +172,15 @@ static int decodeSensor(char* raw, enum ws_types ws_type, float scale, float* va
 }
 
 // Expects the medium to already be open:
-static int readBlock (WVIEWD_WORK *work, int offset, UCHAR* buffer)
+static int readBlock (WVIEWD_WORK *work, int offset, uint8_t* buffer)
 {
     // Read 32 bytes data at offset 'offset':
     // After sending the read command, the device will send back 32 bytes data within 100ms.
     // If not, then it means the command has not been received correctly.
+    // Read repeatedly until the record stabilizes (two consecutive reads are equal).
 
-    char     rqstBuffer[8];
-    int      retVal;
+    uint8_t  rqstBuffer[8], oldBuffer[32], newBuffer[32];
+    int      retVal, readDone = FALSE, firstTime = TRUE;
 
     rqstBuffer[0] = 0xA1;                   // READ COMMAND
     rqstBuffer[1] = (char)(offset / 256);   // READ ADDRESS HIGH
@@ -191,42 +192,67 @@ static int readBlock (WVIEWD_WORK *work, int offset, UCHAR* buffer)
     rqstBuffer[7] = 0x20;                   // END MARK
 
     // Read any pending data on USB bus and discard before starting:
-    (*(work->medium.usbhidRead))(&work->medium, buffer, 32, 500);
+    (*(work->medium.usbhidRead))(&work->medium, newBuffer, 32, 500);
 
-    // Request read of 32-byte chunk from offset:
-    retVal = (*(work->medium.usbhidWrite))(&work->medium, rqstBuffer, 8);
-    if (retVal != 8)
+    // Read until consecutive reads produce an identical buffer:
+    while ((!work->exiting) && (!readDone))
     {
-        radMsgLog (PRI_HIGH, "WH1080: write data request failed!");
-        return ERROR;
-    }
+        // Request read of 32-byte chunk from offset:
+        retVal = (*(work->medium.usbhidWrite))(&work->medium, rqstBuffer, 8);
+        if (retVal != 8)
+        {
+            radMsgLog (PRI_HIGH, "WH1080: write data request failed!");
+            return ERROR;
+        }
+    
+        // Read 32-byte chunk and place in buffer:
+        retVal = (*(work->medium.usbhidRead))(&work->medium, newBuffer, 32, 1000);
+        if (retVal != 32)
+        {
+            radMsgLog (PRI_HIGH, "WH1080: read data block failed!");
+            return ERROR;
+        }
 
-    // Read 32-byte chunk and place in buffer:
-    retVal = (*(work->medium.usbhidRead))(&work->medium, buffer, 32, 1000);
-    if (retVal != 32)
-    {
-        radMsgLog (PRI_HIGH, "WH1080: read data block failed!");
-        return ERROR;
+        // Compare to previous result:
+        if (!firstTime)
+        {
+            if (memcmp(oldBuffer, newBuffer, 32) == 0)
+            {
+                // They match and we are done:
+                memcpy(buffer, newBuffer, 32);
+                readDone = TRUE;
+            }
+            else
+            {
+                radMsgLog (PRI_STATUS, "WH1080: readBlock buffer still changing");
+            }
+        }
+        else
+        {
+            firstTime = FALSE;
+        }
+
+        memcpy(oldBuffer, newBuffer, 32);
     }
 
     return OK;
 }
 
 // Expects the medium to already be open:
-static int writeBlock (WVIEWD_WORK *work, int offset, UCHAR* buffer)
+static int writeBlock (WVIEWD_WORK *work, int offset, uint8_t* buffer)
 {
     // Write 32 bytes data at offset 'offset':
 
     char     rqstBuffer[8];
     int      retVal;
 
-    rqstBuffer[0] = 0xA0;                   // READ COMMAND
-    rqstBuffer[1] = (char)(offset / 256);   // READ ADDRESS HIGH
-    rqstBuffer[2] = (char)(offset & 0xFF);  // READ ADDRESS LOW
+    rqstBuffer[0] = 0xA0;                   // WRITE COMMAND
+    rqstBuffer[1] = (char)(offset / 256);   // WRITE ADDRESS HIGH
+    rqstBuffer[2] = (char)(offset & 0xFF);  // WRITE ADDRESS LOW
     rqstBuffer[3] = 0x20;                   // END MARK
-    rqstBuffer[4] = 0xA0;                   // READ COMMAND
-    rqstBuffer[5] = (char)(offset / 256);   // READ ADDRESS HIGH
-    rqstBuffer[6] = (char)(offset & 0xFF);  // READ ADDRESS LOW
+    rqstBuffer[4] = 0xA0;                   // WRITE COMMAND
+    rqstBuffer[5] = (char)(offset / 256);   // WRITE ADDRESS HIGH
+    rqstBuffer[6] = (char)(offset & 0xFF);  // WRITE ADDRESS LOW
     rqstBuffer[7] = 0x20;                   // END MARK
 
     // Request write of 32-byte chunk from offset:
@@ -259,7 +285,7 @@ static int writeBlock (WVIEWD_WORK *work, int offset, UCHAR* buffer)
 // Expects the medium to already be open:
 static int writeDataRefresh (WVIEWD_WORK *work)
 {
-    UCHAR    rqstBuffer[8], readBuffer[8];
+    uint8_t  rqstBuffer[8], readBuffer[8];
     int      retVal;
 
     rqstBuffer[0] = 0xA2;                   // One byte write command
@@ -290,31 +316,40 @@ static int writeDataRefresh (WVIEWD_WORK *work)
 }
 
 // Expects the medium to already be open:
-static int readFixedBlock(WVIEWD_WORK *work, UCHAR* block)
+static int readFixedBlock(WVIEWD_WORK *work, uint8_t* block)
 {
     // Read fixed block:
     if (readBlock(work, 0, block) == ERROR)
     {
+        radMsgLog (PRI_HIGH, "WH1080: readFixedBlock readBlock failed");
         return ERROR;
     }
 
-    // Check for valid data:
-    if (((block[0] == 0x55) && (block[1] == 0xAA)) ||
-        ((block[0] == 0xFF) && (block[1] == 0xFF)) ||
-        ((block[0] == 0x55) && (block[1] == 0x55)))
+    // Check for valid magic numbers:
+    // This is hardly an exhaustive list and I can find no definitive 
+    // documentation that lists all possible values; further, I suspect it is
+    // more of a header than a magic number...
+    if ((block[0] == 0x55) ||
+        (block[0] == 0xFF) ||
+        (block[0] == 0x01) ||
+        ((block[0] == 0x00) && (block[1] == 0x1E)) ||
+        ((block[0] == 0x00) && (block[1] == 0x01)))
     {
         return OK;
     }
     else
     {
-        radMsgLog (PRI_HIGH, "WH1080: readFixedBlock bad magic data %2.2X %2.2X",
+        radMsgLog (PRI_HIGH, "WH1080: readFixedBlock bad magic number %2.2X %2.2X",
                    (int)block[0], (int)block[1]);
-        return ERROR;
+        radMsgLog(PRI_HIGH, 
+                  "WH1080: You may want to clear the memory on the station "
+                  "console to remove any invalid records or data...");
+        return ERROR_ABORT;
     }
 }
 
 // Expects the medium to already be open:
-static int writeFixedBlock(WVIEWD_WORK *work, UCHAR* block)
+static int writeFixedBlock(WVIEWD_WORK *work, uint8_t* block)
 {
     // Set for valid data:
     block[0] = 0x55;
@@ -341,7 +376,7 @@ static int writeFixedBlock(WVIEWD_WORK *work, UCHAR* block)
 static int readStationData (WVIEWD_WORK *work)
 {
     WH1080_IF_DATA*     ifWorkData = (WH1080_IF_DATA*)work->stationData;
-    int                 currentPosition, index;
+    int                 currentPosition, readPosition, index, retVal;
 
     if ((*(work->medium.usbhidInit))(&work->medium) != OK)
     {
@@ -349,8 +384,16 @@ static int readStationData (WVIEWD_WORK *work)
     }
 
     // Read the WH1080 fixed block:
-    if (readFixedBlock(work, &wh1080Work.controlBlock[0]) == ERROR)
+    retVal = readFixedBlock(work, &wh1080Work.controlBlock[0]);
+    if (retVal == ERROR_ABORT)
     {
+        // Try again later (bad magic number):
+        (*(work->medium.usbhidExit))(&work->medium);
+        return ERROR_ABORT;
+    }
+    else if (retVal == ERROR)
+    {
+        // USB interface error:
         (*(work->medium.usbhidExit))(&work->medium);
         return ERROR;
     }
@@ -358,42 +401,56 @@ static int readStationData (WVIEWD_WORK *work)
     // Get the current record position; the WH1080 reports the record it is 
     // building, thus if it changes we need the prior just finished record:
     currentPosition = (int)getUSHORT(&wh1080Work.controlBlock[WH1080_CURRENT_POS]);
-    currentPosition -= WH1080_BUFFER_RECORD;
-    if (currentPosition < WH1080_BUFFER_START)
+
+    // Make sure the index is aligned on 16-byte boundary:
+    if ((currentPosition % 16) != 0)
     {
-        // wrap back around to the end of the memory block:
-        currentPosition = WH1080_BUFFER_END;
+        // bogus, try again later:
+        (*(work->medium.usbhidExit))(&work->medium);
+        return ERROR_ABORT;
+    }
+
+    // Is this the first time?
+    if (wh1080Work.lastRecord == -1)
+    {
+        // Yes.
+        wh1080Work.lastRecord = currentPosition;
+        (*(work->medium.usbhidExit))(&work->medium);
+        return ERROR_ABORT;
     }
 
     // Is there a new record?
     if (currentPosition == wh1080Work.lastRecord)
     {
-        // No!
+        // No, wait till it is finished.
         (*(work->medium.usbhidExit))(&work->medium);
         return ERROR_ABORT;
     }
 
-    // Read current and next record on first read on even position
-    if (readBlock(work, currentPosition, &wh1080Work.recordBlock[0]) == ERROR)
+    // Read last record that is now complete:
+    if (readBlock(work, wh1080Work.lastRecord, &wh1080Work.recordBlock[0]) == ERROR)
     {
         radMsgLog (PRI_HIGH, "WH1080: read data block at index %d failed!",
-                   currentPosition);
+                   wh1080Work.lastRecord);
         (*(work->medium.usbhidExit))(&work->medium);
         return ERROR;
     }
 
     (*(work->medium.usbhidExit))(&work->medium);
 
+    readPosition = wh1080Work.lastRecord;
     wh1080Work.lastRecord = currentPosition;
 
 //radMsgLogData(wh1080Work.recordBlock, 32);
 
     // Is the record valid? Check for unpopulated record or no sensor data
     // received status bit:
-    if (((wh1080Work.recordBlock[0] != 1)) ||
-        ((wh1080Work.recordBlock[WH1080_STATUS] & 0x40) != 0))
+    if ((wh1080Work.recordBlock[WH1080_STATUS] & 0x40) != 0)
     {
         // No!
+        radMsgLog (PRI_HIGH, 
+                   "WH1080: data block at index %d has bad status, ignoring the record",
+                   readPosition);
         return ERROR_ABORT;
     }
 
@@ -407,6 +464,9 @@ static int readStationData (WVIEWD_WORK *work)
             != OK)
         {
             // Bad sensor data, abort this cycle:
+            radMsgLog (PRI_HIGH, 
+                       "WH1080: data block at index %d has bad sensor value, ignoring the record",
+                       readPosition);
             return ERROR_ABORT;
         }
     }
@@ -463,29 +523,29 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WH1080_DATA *src)
     {
         tempfloat = src->outhumidity;
         tempfloat += 0.5;
-        dest->outHumidity  = (USHORT)tempfloat;
+        dest->outHumidity  = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windAvgSpeed && src->windAvgSpeed <= 250)
     {
         tempfloat = src->windAvgSpeed;
         tempfloat += 0.5;
-        dest->windSpeed  = (USHORT)tempfloat;
+        dest->windSpeed  = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windDir && src->windDir <= 360)
     {
         tempfloat = src->windDir;
         tempfloat += 0.5;
-        dest->windDir        = (USHORT)tempfloat;
-        dest->windGustDir    = (USHORT)tempfloat;
+        dest->windDir        = (uint16_t)tempfloat;
+        dest->windGustDir    = (uint16_t)tempfloat;
     }
 
     if (0 <= src->windGustSpeed && src->windGustSpeed <= 250)
     {
         tempfloat = src->windGustSpeed;
         tempfloat += 0.5;
-        dest->windGust       = (USHORT)tempfloat;
+        dest->windGust       = (uint16_t)tempfloat;
     }
 
     if (0 <= src->rain)
@@ -535,7 +595,7 @@ static void storeLoopPkt (WVIEWD_WORK *work, LOOP_PKT *dest, WH1080_DATA *src)
     dest->inTemp                        = src->intemp;
     tempfloat = src->inhumidity;
     tempfloat += 0.5;
-    dest->inHumidity                    = (USHORT)tempfloat;
+    dest->inHumidity                    = (uint16_t)tempfloat;
 
     return;
 }
@@ -575,14 +635,22 @@ int wh1080Init (WVIEWD_WORK *work)
     }
 
     // Set the station to log data once per minute:
-    if (readFixedBlock(work, controlBlock) == ERROR)
+    while ((!work->exiting) && (readFixedBlock(work, controlBlock) != OK))
     {
+        radMsgLog (PRI_HIGH, "WH1080: Initial fixed block read failed");
         (*(work->medium.usbhidExit))(&work->medium);
-        return ERROR;
+        radUtilsSleep(5000);
+        (*(work->medium.usbhidInit))(&work->medium);
+        radMsgLog (PRI_HIGH, "WH1080: Retrying initial fixed block read");
     }
 
     // For some reason the WH1080 wants the IF closed between a read and a write:
     (*(work->medium.usbhidExit))(&work->medium);
+    if (work->exiting)
+    {
+        return ERROR;
+    }
+
     controlBlock[WH1080_SAMPLING_INTERVAL] = 1;
     (*(work->medium.usbhidInit))(&work->medium);
 
@@ -592,23 +660,34 @@ int wh1080Init (WVIEWD_WORK *work)
         return ERROR;
     }
 
+    radUtilsSleep(2000);
+
     (*(work->medium.usbhidExit))(&work->medium);
-    radUtilsSleep(500);
+
+    radUtilsSleep(1000);
+
+    wh1080Work.lastRecord = -1;
 
     // populate the LOOP structure:
-    while ((! work->exiting) && (readStationData(work) != OK))
+    radMsgLog (PRI_HIGH, "Waiting for the next weather record to be ready "
+                         "in the console to populate initial wview sensor readings "
+                         "(this could take some time);");
+    radMsgLog (PRI_HIGH, "While waiting be sure you are receiving all sensors on the console;");
+    radMsgLog (PRI_HIGH, "if not, you may need to relocate the sensors or the console.");
+    while ((!work->exiting) && (readStationData(work) != OK))
     {
-        radMsgLog (PRI_HIGH, "Failed to read initial station data, retrying in 5 seconds:");
-        radMsgLog (PRI_HIGH, "Is your station receiving all sensors on the console?");
-        radMsgLog (PRI_HIGH, "If not, you may need to relocate the sensors or the console.");
-        radUtilsSleep(5000);
+        radUtilsSleep(1000);
+    }
+    if (work->exiting)
+    {
+        return ERROR;
     }
 
     ifWorkData->wh1080Readings = wh1080Work.sensorData;
     storeLoopPkt (work, &work->loopPkt, &ifWorkData->wh1080Readings);
 
     // we must indicate successful completion here -
-    // even though we are synchronous, the daemon wants to see this event
+    // even though we are synchronous, the daemon wants to see this event:
     radProcessEventsSend (NULL, STATION_INIT_COMPLETE_EVENT, 0);
 
     return OK;

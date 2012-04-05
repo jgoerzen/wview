@@ -2,6 +2,124 @@ RELEASE VERSION HISTORY (newest to oldest)
 ------------------------------------------
 
 
+5.20.1    03-20-2012
+--------------------
+
+radlib version required: 2.12.0 or newer
+
+1)  Modified http rain submission (Wunderground and Weatherforyou) so only the
+    "rainin" parameter is sent so daily rain will be correct. 
+
+
+
+
+5.20.0    03-17-2012
+--------------------
+
+radlib version required: 2.12.0 or newer
+
+1)  Added "wait_for_time_set" function to most wview start script examples so 
+    wview daemons are not started until the system time is set. This applies to
+    platforms without a real time clock which must reset their time during 
+    startup.
+
+2)  Updated the User Manual section on skin selection to better describe enabling
+    extended data generation (UV, ET, radiation).
+
+3)  Updated the debian post install script to try harder to find the default http
+    document root location for creation of symbolic links to wviewmgmt and the
+    weather home page.
+
+4)  Added new configuration option to optionally disable using the Vantage Pro 
+    console archive records and instead autogenerate them from the LOOP data.
+    This is how all other stations work. It also supports non-standard console
+    interfaces (those not using the datalogger on the console).
+
+5)  Updated the Weatherforyou URL for data submissions.
+
+6)  Fixed bug with DataFeed clients that caused an infinite loop if you
+    restarted wview while there was a datafeed client connection.
+
+7)  Fixed bug with Alarm Type configuration introduced in 5.19.0.
+
+8)  Changed TWI station to compute rain fall rate as it is reported to not
+    be provided by the station.
+
+9)  Added socket retry logic to the station ethernet interface (used by the
+    Vantage Pro IP datalogger and any serial-to-ethernet device).
+
+10) Modified CWOP host name to IP address resolution so that 'getaddrinfo' is
+    used instead of 'gethostbyname' and all results are tried in the order they 
+    are returned. This requires radlib 2.12.0 or newer.
+
+11) Modified the WH1080 station interface to relax packet header requirements
+    so it is compliant with more stations of this type. Also hardened the read
+    process to require two consecutive matching reads of any record block.
+    Added log text to indicate that bad magic numbers can be resolved by clearing
+    the station memory.
+
+12) Added bounds checking for calibrated humidity values so they don't fall
+    outside [0, 100].
+
+13) Fixed a bug with datafeed client utilites which incorrectly converted
+    ARCHIVE_VALUE_NULL (-100000) when preparing a packet for network transmission.
+
+14) Fixed a bug with wind average computation that overflowed the accumulator
+    for very large sample size.
+
+15) Added a default logrotate configuration for APT installs.
+
+16) Fixed a bug introduced with 5.19.0 which caused the wind and windgust values
+    to always be the same.
+
+17) Removed requirement for a rain sensor for the WMRUSB stations. Stopped sanity
+    check of dewpoint values from WMR console which can vary wildly when the
+    temperature is low.
+
+18) Fixed a data size mismatch when the virtual server is used and one end is 
+    64-bit and the other end is 32-bit. Modified LOOP_PKT and ARCHIVE_PKT to
+    use sized integers (int32_t) defined in stdint.h.
+
+19) Incorporated Debbie P's changes for the debian wview start script so it uses
+    start-stop-daemon and supports running wview processes as a non-root user
+    specified in a new wview-user config file.
+
+20) Modified wviewmgmt Station page to hide location entry if the station type
+    is Davis Vantage Pro. ELEV/LAT/LON are defined in the VP console and not by
+    wview.
+
+21) Added configuration item "Default Wind Units" to the wviewmgmt generation
+    page. Added support for all tags and graphics to use the selected wind
+    units. You can now select one of mph, m/s, knots or km/h for the global
+    default wind units in wview.
+
+22) Fixed UV processing for FFFF protocol WMRUSB stations.
+
+23) Added support for last 60 minutes rain ("r"), last 24 hours rain ("p") and
+    solar radiation ("L") to CWOP packet submission. The use of "P" (rain since
+    local midnight) has been removed in favor of the Madis-preferred rain
+    reporting data.
+
+24) Added support for solar radiation and UV to http clients (Wunderground
+    and WeatherForYou). If these sensor values are populated they will now
+    be transmitted.
+
+25) Added exfoliation skin designed by Matthew Wall.
+
+26) Changed the minimum CWOP reporting interval from 10 to 5 minutes.
+
+27) Added n1otx's example script for fast SQLite3 queries:
+    examples/scripts/rainInLastWeek.sh.
+
+28) Added socket recovery logic to the ethernet station medium. Added restart
+    logic to the serial medium. Added restart function to the medium abstraction.
+
+29) Changed debian package definition to "Recommends" apache and php-sqlite as
+    opposed to "Requires".
+
+
+
+
 5.19.0    05-22-2011
 --------------------
 

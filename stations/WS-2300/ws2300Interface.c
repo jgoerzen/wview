@@ -302,15 +302,15 @@ int stationGetPosition (WVIEWD_WORK *work)
 {
     // just set the values from our internal store - we retrieved them in
     // stationInit
-    work->elevation     = (short)ws2300WorkData.elevation;
+    work->elevation     = (int16_t)ws2300WorkData.elevation;
     if (ws2300WorkData.latitude >= 0)
-        work->latitude      = (short)((ws2300WorkData.latitude*10)+0.5);
+        work->latitude      = (int16_t)((ws2300WorkData.latitude*10)+0.5);
     else
-        work->latitude      = (short)((ws2300WorkData.latitude*10)-0.5);
+        work->latitude      = (int16_t)((ws2300WorkData.latitude*10)-0.5);
     if (ws2300WorkData.longitude >= 0)
-        work->longitude     = (short)((ws2300WorkData.longitude*10)+0.5);
+        work->longitude     = (int16_t)((ws2300WorkData.longitude*10)+0.5);
     else
-        work->longitude     = (short)((ws2300WorkData.longitude*10)-0.5);
+        work->longitude     = (int16_t)((ws2300WorkData.longitude*10)-0.5);
 
     radMsgLog (PRI_STATUS, "station location: elevation: %d feet",
                work->elevation);
