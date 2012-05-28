@@ -297,7 +297,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_1 id=field_Alarms_Type_1 size='40' value=
         '<?php echo $field_Alarms_Type_1 ?>'>
     </td>
     <td></td>
@@ -601,7 +601,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_3 id=field_Alarms_Type_3 size='40' value=
         '<?php echo $field_Alarms_Type_3 ?>'>
     </td>
     <td></td>
@@ -754,7 +754,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_4 id=field_Alarms_Type_4 size='40' value=
         '<?php echo $field_Alarms_Type_4 ?>'>
     </td>
     <td></td>
@@ -906,7 +906,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_5 id=field_Alarms_Type_5 size='40' value=
         '<?php echo $field_Alarms_Type_5 ?>'>
     </td>
     <td></td>
@@ -1058,7 +1058,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_6 id=field_Alarms_Type_6 size='40' value=
         '<?php echo $field_Alarms_Type_6 ?>'>
     </td>
     <td></td>
@@ -1210,7 +1210,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_7 id=field_Alarms_Type_7 size='40' value=
         '<?php echo $field_Alarms_Type_7 ?>'>
     </td>
     <td></td>
@@ -1362,7 +1362,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_8 id=field_Alarms_Type_8 size='40' value=
         '<?php echo $field_Alarms_Type_8 ?>'>
     </td>
     <td></td>
@@ -1514,7 +1514,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_9 id=field_Alarms_Type_9 size='40' value=
         '<?php echo $field_Alarms_Type_9 ?>'>
     </td>
     <td></td>
@@ -1666,7 +1666,7 @@
       </label>
     </td>
     <td valign="center" bgcolor="#FFFFFF">
-      <input class=mainForm type=text name=field_Alarms_Type_2 id=field_Alarms_Type_2 size='40' value=
+      <input class=mainForm type=text name=field_Alarms_Type_10 id=field_Alarms_Type_10 size='40' value=
         '<?php echo $field_Alarms_Type_10 ?>'>
     </td>
     <td></td>
